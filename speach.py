@@ -26,9 +26,7 @@ def mainfunction(source):
     elif recognize_lower == "open google":
         webbrowser.open_new("http://google.com")
     elif recognize_lower.startswith("search for"):
-       # print(type(recognize))
         encode = "".join(recognize.encode("ascii", "ignore"))
-       # print(type(encode.split(" ")[2:]))
         google_search(encode.partition("search for")[2])
     elif recognize_lower == "exit":
         exit()
