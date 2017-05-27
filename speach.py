@@ -1,46 +1,48 @@
 import subprocess
-
+import webbrowser
+import os
 import speech_recognition as sr
 
 
-# obtain audio from the microphone
-r = sr.Recognizer()
-with sr.Microphone() as source:
-    print("Say something!")
-    audio = r.listen(source, phrase_time_limit=5)
+def google_search(text):
+    split_text = text.split(" ")
+    google = "http://google.com#q="
+    search_string = google + "+".join(split_text)
+    return webbrowser.open_new(search_string)
 
-recognize = r.recognize_google(audio)
-recognize_lower=recognize.lower()
+def mainfunction(source):
+    audio = r.listen(source)
+    recognize = r.recognize_google(audio)
+    recognize_lower = recognize.lower()
+    print(recognize)
+    if recognize_lower == "mute":
+        os.popen2("nircmd.exe mutesysvolume 1")
+    elif recognize_lower == "unmute":
+        os.popen2("nircmd.exe mutesysvolume 0")
+    elif "calc" in recognize_lower:
+        os.popen2("calc")
+    elif recognize_lower.startswith("run"):
+        print recognize
+    elif recognize_lower == "open google":
+        webbrowser.open_new("http://google.com")
+    elif recognize_lower.startswith("search for"):
+       # print(type(recognize))
+        encode = "".join(recognize.encode("ascii", "ignore"))
+       # print(type(encode.split(" ")[2:]))
+        google_search(encode.partition("search for")[2])
+    elif recognize_lower == "exit":
+        exit()
+    else:
+        print "This is string you told: " + recognize
 
-def osrun(cmd):
-    PIPE = subprocess.PIPE
-    p = subprocess.Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT)
 
-
-# try:
-#     # for testing purposes, we're just using the default API key
-#     # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
-#     # instead of `r.recognize_google(audio)`
-#     print("Google Speech Recognition thinks you said: " + recognize)
-# except sr.UnknownValueError:
-#     print("Google Speech Recognition could not understand audio")
-# except sr.RequestError as e:
-#     print("Could not request results from Google Speech Recognition service; {0}".format(e))
-
-if "calc" in recognize_lower:
-    osrun('calc')
-if recognize_lower.startswith("open"):
-    print recognize
-else:
-    print "This is string you told: " + recognize
-
-# def commands(command):
-#     if str(command).startswith("open"):
-#         open()
-#     else:
-#         return False
-#
-# def open():
-#     return "This is open command"
-#
-# commands(recognize_lower)
+if __name__ == "__main__":
+    r = sr.Recognizer()
+    print("I'm listening to you!")
+    with sr.Microphone() as source:
+        r.adjust_for_ambient_noise(source)
+        while 1:
+            try:
+                mainfunction(source)
+            except sr.UnknownValueError:
+                pass
