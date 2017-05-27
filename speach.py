@@ -33,3 +33,14 @@ if recognize_lower.startswith("open"):
     print recognize
 else:
     print "This is string you told: " + recognize
+
+# def commands(command):
+#     if str(command).startswith("open"):
+#         open()
+#     else:
+#         return False
+#
+# def open():
+#     return "This is open command"
+#
+# commands(recognize_lower)
