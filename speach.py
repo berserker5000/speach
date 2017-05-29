@@ -11,9 +11,23 @@ def get_os_type():
 
 def mute_system(_os):
     if _os == "Linux":
-        os.popen2("amixer -D pulse sset Master 0%")
+        return os.popen2("amixer -D pulse sset Master 0%")
     elif _os == "Windows":
-        os.popen2("nircmd.exe mutesysvolume 1")
+        return os.popen2("nircmd.exe mutesysvolume 1")
+
+
+def unmute_system(_os):
+    if _os == "Linux":
+        return os.popen2("amixer -D pulse sset Master 100%")
+    elif _os == "Windows":
+        return os.popen2("nircmd.exe mutesysvolume 0")
+
+
+def run_calculator(_os):
+    if _os == "Linux":
+        return os.popen2("gnome-calculator")
+    elif _os == "Windows":
+        return os.popen2("calc")
 
 def google_search(text):
     split_text = text.split(" ")
@@ -28,14 +42,12 @@ def mainfunction(source):
     recognize = r.recognize_google(audio)
     recognize_lower = recognize.lower()
     print(recognize)
-    if "mute" in recognize_lower.split(" ") :
+    if "mute" in recognize_lower.split(" "):
         mute_system(_os)
-    elif recognize_lower == "unmute":
-        os.popen2("nircmd.exe mutesysvolume 0")
-    elif "calc" in recognize_lower:
-        os.popen2("calc")
-    elif recognize_lower.startswith("run"):
-        print recognize
+    elif "unmute" in recognize_lower.split(" "):
+        unmute_system(_os)
+    elif "calc" or "calculator" in recognize_lower.split(" "):
+        run_calculator(_os)
     elif recognize_lower == "open google":
         webbrowser.open_new("http://google.com")
     elif recognize_lower.startswith("search for"):
