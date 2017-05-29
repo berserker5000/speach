@@ -1,8 +1,19 @@
-import subprocess
-import webbrowser
 import os
+import platform
+import webbrowser
+
 import speech_recognition as sr
 
+
+def get_os_type():
+        return platform.system()
+
+
+def mute_system(_os):
+    if _os == "Linux":
+        os.popen2("amixer -D pulse sset Master 0%")
+    elif _os == "Windows":
+        os.popen2("nircmd.exe mutesysvolume 1")
 
 def google_search(text):
     split_text = text.split(" ")
@@ -10,13 +21,15 @@ def google_search(text):
     search_string = google + "+".join(split_text)
     return webbrowser.open_new(search_string)
 
+
 def mainfunction(source):
+    _os = get_os_type()
     audio = r.listen(source)
     recognize = r.recognize_google(audio)
     recognize_lower = recognize.lower()
     print(recognize)
-    if recognize_lower == "mute":
-        os.popen2("nircmd.exe mutesysvolume 1")
+    if "mute" in recognize_lower.split(" ") :
+        mute_system(_os)
     elif recognize_lower == "unmute":
         os.popen2("nircmd.exe mutesysvolume 0")
     elif "calc" in recognize_lower:
