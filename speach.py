@@ -1,12 +1,20 @@
 import os
 import platform
 import webbrowser
+import pyttsx
 
 import speech_recognition as sr
 
 
 def get_os_type():
         return platform.system()
+
+
+def speaking(text):
+    engine = pyttsx.init()
+    engine.setProperty('voice','english')
+    engine.setProperty('rate',190)
+    return engine.say(text)
 
 
 def mute_system(_os):
