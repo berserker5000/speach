@@ -87,8 +87,9 @@ def mainfunction(source):
 
 if __name__ == "__main__":
     r = sr.Recognizer()
-    with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source)
+    with sr.Microphone(
+    ) as source:
+        r.adjust_for_ambient_noise(source,duration=2)
         speaking("Hello master. I'm Listening to you.")
         while 1:
             try:
