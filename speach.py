@@ -1,6 +1,9 @@
-import os,time,re
+import os
+import time
+import re
 import platform
 import webbrowser
+
 import pyttsx
 import speech_recognition as sr
 
@@ -8,8 +11,10 @@ import speech_recognition as sr
 def get_os_type():
     return platform.system()
 
+
 def current_time():
     return time.strftime("%A %d of %b %Y year %H hours %M minutes")
+
 
 def speaking(text):
     engine = pyttsx.init()
@@ -17,6 +22,12 @@ def speaking(text):
     engine.setProperty('rate', 190)
     engine.say(text)
     return engine.runAndWait()
+
+
+def q(dict, recognize, action):
+    for i in dict:
+        if i in recognize:
+            return action
 
 
 def mute_system(_os):
@@ -46,6 +57,7 @@ def google_search(text):
     search_string = google + "+".join(split_text)
     return webbrowser.open_new(search_string)
 
+
 def adjust_volume(_os, number):
     if type(number) == list:
         number = "".join(number)
@@ -56,12 +68,23 @@ def adjust_volume(_os, number):
         return os.popen2("nircmd.exe setsysvolume " + str(num))
 
 
+def question(audio, action):
+    yes = ['yep', 'yes', 'ea', ' yeah']
+    no = ['no', 'nope']
+    speaking("Are you sure you want to " + str(audio))
+    for i in yes:
+        if i in audio:
+            return speaking("As you wish. I will do " + str(audio)), action
+    for i in no:
+        if i in audio:
+            return speaking("Ok, I wouldn't do " + str(audio))
+
+
 def mainfunction(source):
     _os = get_os_type()
     audio = r.listen(source)
     recognize = r.recognize_google(audio)
     recognize_lower = recognize.lower()
-    #print(recognize)
     if "mute" in recognize_lower.split(" "):
         mute_system(_os)
     elif "unmute" in recognize_lower.split(" "):
@@ -77,7 +100,7 @@ def mainfunction(source):
         exit()
     elif "set volume" in recognize_lower:
         vol_encode = "".join(recognize.encode("ascii", "ignore"))
-        adjust_volume(_os,re.findall('(\d)',vol_encode))
+        adjust_volume(_os, re.findall('(\d)', vol_encode))
     elif "time" in recognize_lower:
         speaking(current_time())
     else:
