@@ -18,7 +18,9 @@ def current_time():
 
 def speaking(text):
     engine = pyttsx.init()
-    engine.setProperty('voice', 'english')
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[1].id)
+    engine.setProperty('voice','english')
     engine.setProperty('rate', 190)
     engine.say(text)
     return engine.runAndWait()
