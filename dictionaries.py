@@ -1,3 +1,4 @@
+'''
 from urllib import urlopen
 
 __author__ = 'Administrator'
