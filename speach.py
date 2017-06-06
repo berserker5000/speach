@@ -1,9 +1,10 @@
 import os
-import time
-import re
 import platform
+import re
+import time
 import webbrowser
 
+import google
 import pyttsx
 import speech_recognition as sr
 
@@ -51,6 +52,19 @@ def run_calculator(_os):
         return os.popen2("gnome-calculator")
     elif _os == "Windows":
         return os.popen2("calc")
+
+
+def unknown(text):
+    x,y=[],[]
+    gs=google.search('https://google.com/#q='+str(text),pause=0, stop=15)
+    for link in gs:
+        x.append(link)
+
+    for i in x:
+        y.append(i.split('/')[2])
+
+    dictionary = dict(zip(x,y))
+    return dictionary
 
 
 def google_search(text):
