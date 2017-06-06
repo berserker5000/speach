@@ -1,4 +1,3 @@
-'''
 from urllib import urlopen
 
 __author__ = 'Administrator'
@@ -7,16 +6,21 @@ def google_dict():
     gd = ['google', 'search for', 'search', 'look for', 'look', 'knowledge']
     return gd
 
+import google
 
-from google import search, filter_result
-x = []
+def unknown(text):
+    x,y=[],[]
+    gs=google.search('https://google.com/#q='+str(text),pause=2.0,stop=20)
+    for link in gs:
+        x.append(link)
 
-for i in search("hello world", stop=15):
-    l = i.encode('ascii', 'ignore')
-    x.append(l)
+    for i in x:
+        y.append(i.split('/')[2])
 
-for i in x:
-    print(i)
+    dictionary = dict(zip(x,y))
+    return dictionary
+
+
 
 '''
 # This scripts allows to get a list of all installed products in a windows
