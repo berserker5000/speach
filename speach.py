@@ -4,6 +4,7 @@ import re
 import time
 import webbrowser
 from windows_commands import windows_soft
+from linux_commands import generate_sw_list,run_bash_command
 import google
 import pyttsx
 import speech_recognition as sr
@@ -125,6 +126,7 @@ def mainfunction(source):
 
 
 if __name__ == "__main__":
+    generate_sw_list()
     r = sr.Recognizer()
     with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source,duration=2)
