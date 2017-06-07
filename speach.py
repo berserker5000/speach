@@ -3,7 +3,7 @@ import platform
 import re
 import time
 import webbrowser
-
+from windows_commands import windows_soft
 import google
 import pyttsx
 import speech_recognition as sr
