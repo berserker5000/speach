@@ -4,11 +4,10 @@ import re
 import time
 import webbrowser
 
-import google
 import pyttsx
 import speech_recognition as sr
 
-from linux_commands import generate_sw_list
+from linux_commands import generate_sw_list,run_bash_command
 
 
 def get_os_type():
@@ -43,12 +42,11 @@ def unmute_system(_os):
         return os.popen2("nircmd.exe mutesysvolume 0")
 
 
-def comparator(lst, text):
-    t1 = text.split(" ")
-    for i in lst:
-        for k in t1:
-            if i == k:
-                return i
+def comparator(lst, text): #lst = set, text = string
+    t1 = text.split(" ") #t1 = list
+    for word in t1:
+        if word in lst:
+            return word
     return ""
 
 
@@ -58,26 +56,16 @@ def run_calculator(_os):
     elif _os == "Windows":
         return os.popen2("calc")
 
-
-def unknown(text):
-    x, y = [], []
-    gs = google.search('https://google.com/#q=' + str(text), pause=0, stop=15)
-    for link in gs:
-        x.append(link)
-
-    for i in x:
-        y.append(i.split('/')[2])
-
-    dictionary = dict(zip(x, y))
-    return dictionary
-
-
 def google_search(text):
     split_text = text.split(" ")
     google = "http://google.com#q="
     search_string = google + "+".join(split_text)
     return webbrowser.open_new(search_string)
 
+def what_to_do(recognize):
+     speaking("Sorry, I don't know how to proceed with " + recognize)
+     speaking("Let's search your question with google!")
+     return google_search(recognize)
 
 def adjust_volume(_os, number):
     if type(number) == list:
@@ -124,22 +112,19 @@ def mainfunction(source):
         adjust_volume(_os, re.findall('(\d)', vol_encode))
     elif "time" in recognize_lower:
         speaking(current_time())
-    elif comparator(generate_sw_list(),recognize_lower) != "":
-        speaking("Trying to run " + str(comparator(generate_sw_list(),recognize_lower)))
-        try:
-            os.popen2(comparator(generate_sw_list(),recognize_lower))
-        except:
-            speaking("Sorry, I don't know how to proceed with " + recognize)
-            speaking("Let's search your question with google!")
-            google_search(recognize_lower)
     else:
-        speaking("Sorry, I don't know how to proceed with " + recognize)
-        speaking("Let's search your question with google!")
-        google_search(recognize_lower)
+        comp = comparator(generate_sw_list(),recognize_lower)
+        if comp != "":
+            speaking("Trying to run " + str(comp))
+            try:
+                run_bash_command(comp)
+            except:
+                what_to_do(recognize)
+        else:
+            what_to_do(recognize)
 
 
 if __name__ == "__main__":
-    generate_sw_list()
     r = sr.Recognizer()
     with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source, duration=2)

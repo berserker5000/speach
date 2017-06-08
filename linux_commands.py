@@ -7,9 +7,9 @@ def linux_soft_list():
 
 
 def generate_sw_list():
-    test = ["docker", 'zoom']
     tmp_name = '/tmp/software_list_tmp.txt'
-    q, w, e = [], [], []
+    q, e = [], []
+    w = set()
 
     try:
         linux_soft_list()
@@ -25,12 +25,10 @@ def generate_sw_list():
         e.append(i.split('/'))
 
     for i in e:
-        w.append(i[0])
+        w.add(i[0])
 
-    for i in test:
-        for o in w[4:]:
-            if i in o:
-                print o
+    return w
+
 
 
 
@@ -38,3 +36,6 @@ def run_bash_command(command):
     process = subprocess.check_output(['bash', '-c',command])
     return process
 
+
+
+generate_sw_list()
