@@ -3,11 +3,12 @@ import platform
 import re
 import time
 import webbrowser
-from windows_commands import windows_soft
-from linux_commands import generate_sw_list,run_bash_command
+
 import google
 import pyttsx
 import speech_recognition as sr
+
+from linux_commands import generate_sw_list
 
 
 def get_os_type():
@@ -22,16 +23,10 @@ def speaking(text):
     engine = pyttsx.init()
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[1].id)
-    engine.setProperty('voice','english')
+    engine.setProperty('voice', 'english')
     engine.setProperty('rate', 190)
     engine.say(text)
     return engine.runAndWait()
-
-
-def q(dict, recognize, action):
-    for i in dict:
-        if i in recognize:
-            return action
 
 
 def mute_system(_os):
@@ -48,6 +43,15 @@ def unmute_system(_os):
         return os.popen2("nircmd.exe mutesysvolume 0")
 
 
+def comparator(lst, text):
+    t1 = text.split(" ")
+    for i in lst:
+        for k in t1:
+            if i == k:
+                return i
+    return ""
+
+
 def run_calculator(_os):
     if _os == "Linux":
         return os.popen2("gnome-calculator")
@@ -56,15 +60,15 @@ def run_calculator(_os):
 
 
 def unknown(text):
-    x,y=[],[]
-    gs=google.search('https://google.com/#q='+str(text),pause=0, stop=15)
+    x, y = [], []
+    gs = google.search('https://google.com/#q=' + str(text), pause=0, stop=15)
     for link in gs:
         x.append(link)
 
     for i in x:
         y.append(i.split('/')[2])
 
-    dictionary = dict(zip(x,y))
+    dictionary = dict(zip(x, y))
     return dictionary
 
 
@@ -120,16 +124,25 @@ def mainfunction(source):
         adjust_volume(_os, re.findall('(\d)', vol_encode))
     elif "time" in recognize_lower:
         speaking(current_time())
+    elif comparator(generate_sw_list(),recognize_lower) != "":
+        speaking("Trying to run " + str(comparator(generate_sw_list(),recognize_lower)))
+        try:
+            os.popen2(comparator(generate_sw_list(),recognize_lower))
+        except:
+            speaking("Sorry, I don't know how to proceed with " + recognize)
+            speaking("Let's search your question with google!")
+            google_search(recognize_lower)
     else:
-        print(recognize)
         speaking("Sorry, I don't know how to proceed with " + recognize)
+        speaking("Let's search your question with google!")
+        google_search(recognize_lower)
 
 
 if __name__ == "__main__":
     generate_sw_list()
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source,duration=2)
+        r.adjust_for_ambient_noise(source, duration=2)
         speaking("Hello master. I'm Listening to you.")
         while 1:
             try:
