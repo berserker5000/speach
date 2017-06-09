@@ -1,3 +1,4 @@
+import os
 from collections import namedtuple
 from ctypes import byref, create_unicode_buffer, windll
 from ctypes.wintypes import DWORD
@@ -85,7 +86,27 @@ def is_product_installed_uid(uid):
     else:
         return True
 
+
 def windows_soft():
     apps = get_installed_products()
     for app in apps:
         return app.ProductName
+
+
+def mute_system():
+    return os.popen2("nircmd.exe mutesysvolume 1")
+
+
+def unmute_system():
+    return os.popen2("nircmd.exe mutesysvolume 0")
+
+
+def run_calculator():
+    return os.popen2("calc")
+
+
+def adjust_volume(number):
+    if type(number) == list:
+        number = "".join(number)
+        num = (int(number) * 65535) / 100
+        return os.popen2("nircmd.exe setsysvolume " + str(num))

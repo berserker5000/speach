@@ -1,9 +1,5 @@
+import os
 import subprocess
-
-
-def linux_soft_list():
-    return subprocess.check_call(["apt", "list", "--installed"], stdout=open('/tmp/software_list_tmp.txt', 'wb'),
-                                 stderr=subprocess.STDOUT)
 
 
 def generate_sw_list():
@@ -12,7 +8,8 @@ def generate_sw_list():
     w = set()
 
     try:
-        linux_soft_list()
+        subprocess.check_call(["apt", "list", "--installed"], stdout=open('/tmp/software_list_tmp.txt', 'wb'),
+                              stderr=subprocess.STDOUT)
     except Exception:
         return "can't proceed with temp software list"
 
@@ -30,12 +27,24 @@ def generate_sw_list():
     return w
 
 
-
-
 def run_bash_command(command):
-    process = subprocess.check_output(['bash', '-c',command])
+    process = subprocess.check_output(['bash', '-c', command])
     return process
 
 
+def mute_system():
+    return os.popen2("amixer -D pulse sset Master 0%")
 
-generate_sw_list()
+
+def unmute_system():
+    return os.popen2("amixer -D pulse sset Master 100%")
+
+
+def run_calculator():
+    return os.popen2("gnome-calculator")
+
+
+def adjust_volume(number):
+    if type(number) == list:
+        number = "".join(number)
+        return os.popen2("amixer -D pulse sset Master " + str(number) + "%")

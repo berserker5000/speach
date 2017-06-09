@@ -1,4 +1,3 @@
-import os
 import platform
 import re
 import time
@@ -7,11 +6,12 @@ import webbrowser
 import pyttsx
 import speech_recognition as sr
 
-from linux_commands import generate_sw_list,run_bash_command
 
-
-def get_os_type():
-    return platform.system()
+_os = platform.system()
+if _os == "Linux":
+    from linux_commands import *
+elif _os == "Windows":
+    from windows_commands import *
 
 
 def current_time():
@@ -28,33 +28,13 @@ def speaking(text):
     return engine.runAndWait()
 
 
-def mute_system(_os):
-    if _os == "Linux":
-        return os.popen2("amixer -D pulse sset Master 0%")
-    elif _os == "Windows":
-        return os.popen2("nircmd.exe mutesysvolume 1")
-
-
-def unmute_system(_os):
-    if _os == "Linux":
-        return os.popen2("amixer -D pulse sset Master 100%")
-    elif _os == "Windows":
-        return os.popen2("nircmd.exe mutesysvolume 0")
-
-
-def comparator(lst, text): #lst = set, text = string
-    t1 = text.split(" ") #t1 = list
+def comparator(lst, text):  # lst = set, text = string
+    t1 = text.split(" ")  # t1 = list
     for word in t1:
         if word in lst:
             return word
     return ""
 
-
-def run_calculator(_os):
-    if _os == "Linux":
-        return os.popen2("gnome-calculator")
-    elif _os == "Windows":
-        return os.popen2("calc")
 
 def google_search(text):
     split_text = text.split(" ")
@@ -62,44 +42,23 @@ def google_search(text):
     search_string = google + "+".join(split_text)
     return webbrowser.open_new(search_string)
 
+
 def what_to_do(recognize):
-     speaking("Sorry, I don't know how to proceed with " + recognize)
-     speaking("Let's search your question with google!")
-     return google_search(recognize)
-
-def adjust_volume(_os, number):
-    if type(number) == list:
-        number = "".join(number)
-    if _os == "Linux":
-        return os.popen2("amixer -D pulse sset Master " + str(number) + "%")
-    elif _os == "Windows":
-        num = (int(number) * 65535) / 100
-        return os.popen2("nircmd.exe setsysvolume " + str(num))
-
-
-def question(audio, action):
-    yes = ['yep', 'yes', 'ea', ' yeah']
-    no = ['no', 'nope']
-    speaking("Are you sure you want to " + str(audio))
-    for i in yes:
-        if i in audio:
-            return speaking("As you wish. I will do " + str(audio)), action
-    for i in no:
-        if i in audio:
-            return speaking("Ok, I wouldn't do " + str(audio))
+    speaking("Sorry, I don't know how to proceed with " + recognize)
+    speaking("Let's search your question with google!")
+    return google_search(recognize)
 
 
 def mainfunction(source):
-    _os = get_os_type()
     audio = r.listen(source)
     recognize = r.recognize_google(audio)
     recognize_lower = recognize.lower()
     if "mute" in recognize_lower.split(" "):
-        mute_system(_os)
+        mute_system()
     elif "unmute" in recognize_lower.split(" "):
-        unmute_system(_os)
+        unmute_system()
     elif "calculator" in recognize_lower.split(" "):
-        run_calculator(_os)
+        run_calculator()
     elif recognize_lower == "open google":
         webbrowser.open_new("http://google.com")
     elif recognize_lower.startswith("search for"):
@@ -109,11 +68,11 @@ def mainfunction(source):
         exit()
     elif "set volume" in recognize_lower:
         vol_encode = "".join(recognize.encode("ascii", "ignore"))
-        adjust_volume(_os, re.findall('(\d)', vol_encode))
+        adjust_volume(re.findall('(\d)', vol_encode))
     elif "time" in recognize_lower:
         speaking(current_time())
     else:
-        comp = comparator(generate_sw_list(),recognize_lower)
+        comp = comparator(generate_sw_list(), recognize_lower)
         if comp != "":
             speaking("Trying to run " + str(comp))
             try:
