@@ -87,10 +87,14 @@ def is_product_installed_uid(uid):
         return True
 
 
-def windows_soft():
+def generate_sw_list():
     apps = get_installed_products()
+    application_list=set()
     for app in apps:
-        return app.ProductName
+        application_list.add(app.ProductName.lower())
+    return application_list
+
+print(generate_sw_list())
 
 
 def mute_system():

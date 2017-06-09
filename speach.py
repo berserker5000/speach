@@ -36,12 +36,15 @@ def mainfunction(source):
         speaking(current_time())
     else:
         comp = comparator(generate_sw_list(), recognize_lower)
-        if comp != "":
+        if comp != "" and _os == "Linux":
             speaking("Trying to run " + str(comp))
             try:
                 run_bash_command(comp)
             except:
                 pass
+        elif comp !="" and _os == "Windows":
+            speaking("Trying to run " + str(comp))
+
         else:
             what_to_do(recognize)
 
