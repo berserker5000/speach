@@ -1,7 +1,7 @@
+import time
 import webbrowser
 
 import pyttsx
-import time
 
 
 def current_time():
@@ -13,13 +13,13 @@ def speaking(text):
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[1].id)
     engine.setProperty('voice', 'english')
-    engine.setProperty('rate', 190)
+    engine.setProperty('rate', 150)
     engine.say(text)
     return engine.runAndWait()
 
 
-def comparator(lst, text):  # lst = set, text = string
-    t1 = text.split(" ")  # t1 = list
+def comparator(lst, text):
+    t1 = text.split(" ")
     for word in t1:
         if word in lst:
             return word

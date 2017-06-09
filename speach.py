@@ -1,7 +1,9 @@
 import platform
 import re
-from general_commands import *
+
 import speech_recognition as sr
+
+from general_commands import *
 
 _os = platform.system()
 if _os == "Linux":
@@ -39,7 +41,7 @@ def mainfunction(source):
             try:
                 run_bash_command(comp)
             except:
-                what_to_do(recognize)
+                pass
         else:
             what_to_do(recognize)
 
@@ -47,10 +49,12 @@ def mainfunction(source):
 if __name__ == "__main__":
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source, duration=2)
+        r.adjust_for_ambient_noise(source)
         speaking("Hello master. I'm Listening to you.")
         while 1:
             try:
                 mainfunction(source)
             except sr.UnknownValueError:
                 pass
+        else:
+            pass
