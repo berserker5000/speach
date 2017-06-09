@@ -33,11 +33,11 @@ def run_bash_command(command):
 
 
 def mute_system():
-    return os.popen2("amixer -D pulse sset Master 0%")
+    return os.popen2("amixer -D pulse sset Master mute")
 
 
 def unmute_system():
-    return os.popen2("amixer -D pulse sset Master 100%")
+    return os.popen2("amixer -D pulse sset Master unmute")
 
 
 def run_calculator():
