@@ -2,6 +2,17 @@ __author__ = 'Administrator'
 import os
 
 
+def generate_sw_list():
+    main_path = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+    directory = os.walk(main_path)
+    names = dict()
+    for root, dirs, files in directory:
+        for f in files:
+            if f.endswith("lnk"):
+                names[f.split(".lnk")[0].lower()] = ('"' + root + "\\" + f + '"')
+    return names
+
+
 def mute_system():
     return os.popen2("nircmd.exe mutesysvolume 1")
 
@@ -22,23 +33,15 @@ def adjust_volume(number):
 
 
 def run_bash_command(command):
-    com = command.split(" ")
-    main_path = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-    directory = os.walk(main_path)
-    names, output = dict(), dict()
-    for root, dirs, files in directory:
-        for f in files:
-            if f.endswith("lnk"):
-                names[f.split(".lnk")[0].lower()] = ('"' + root + f + '"')
-
-    for key, value in names.iteritems():
-        for word in com:
-            if word.lower() in key:
-                output[value] = word.lower()
-
-    for key, value in output.iteritems():
-        print("For " + value + ". I found next programs: " + key)
+       return os.popen2(command)
 
 
-run_bash_command("run fucking Anaconda viber pytty python")
-os.popen2("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 2.7IDLE (Python GUI).lnk")
+
+
+
+output = dict()
+t1 = "open python".split(" ")
+for key, value in generate_sw_list().iteritems():
+    for word in t1:
+        if word.lower() in key:
+            output[value] = word.lower()

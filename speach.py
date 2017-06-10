@@ -43,8 +43,15 @@ def mainfunction(source):
             except:
                 pass
         elif comp !="" and _os == "Windows":
-            speaking("Trying to run " + str(comp))
-
+            if len(comp) > 1:
+                i = 0
+                speaking("I have found several programs. Please choose one to run")
+                for c in comp:
+                    i+=1
+                    print(str(i)+":"+c.split("\\")[-1].split(".lnk")[0])
+            else:
+                speaking("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
+                os.popen2(comp[0])
         else:
             what_to_do(recognize)
 

@@ -1,3 +1,4 @@
+import os
 import time
 import webbrowser
 
@@ -20,9 +21,23 @@ def speaking(text):
 
 def comparator(lst, text):
     t1 = text.split(" ")
-    for word in t1:
-        if word in lst:
-            return word
+    if type(lst) is dict:
+        output = dict()
+        lnk = list()
+        for key, value in lst.iteritems():
+            for word in t1:
+                if word.lower() in key.split(" "):
+                    output[value] = word.lower()
+
+        for key, value in output.iteritems():
+            if value in t1:
+                 lnk.append(key)
+        return lnk
+
+    else:
+        for word in t1:
+            if word in lst:
+                return word
     return ""
 
 
