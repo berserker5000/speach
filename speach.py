@@ -44,11 +44,18 @@ def mainfunction(source):
                 pass
         elif comp !="" and _os == "Windows":
             if len(comp) > 1:
+                dictionary = dict()
                 i = 0
                 speaking("I have found several programs. Please choose one to run")
                 for c in comp:
                     i+=1
                     print(str(i)+":"+c.split("\\")[-1].split(".lnk")[0])
+                    dictionary[i]=c
+                inp = input("Enter number: ")
+                for key, value in dictionary.iteritems():
+                    if inp == key:
+                        os.popen2(value)
+
             else:
                 speaking("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
                 os.popen2(comp[0])
