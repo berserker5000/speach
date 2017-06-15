@@ -139,7 +139,7 @@ class SpeechRecognize(object):
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source)
             try:
-                audio = r.listen(source)
+                audio = r.listen(source,phrase_time_limit=2,timeout=0)
                 recognize = r.recognize_google(audio)
                 recognize_lower = recognize.lower()
                 return str(recognize_lower)
@@ -159,6 +159,7 @@ class DecisionMaker(object):
         self.speak = Speaking()
 
     def decision(self, recognized_text, general_command, os_type):
+        print type(recognized_text)
         if "mute" in recognized_text.split(" "):
             self.command.mute_system()
         elif "unmute" in recognized_text.split(" "):
@@ -222,5 +223,8 @@ if __name__ == '__main__':
     listen = SpeechRecognize()
     speak.speak("Start")
     while True:
-        decision.decision(listen.recognize(), general_commands, _os)
+        try:
+            decision.decision(listen.recognize(), general_commands, _os)
+        except AttributeError:
+            pass
 
