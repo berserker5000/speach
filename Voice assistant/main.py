@@ -1,15 +1,15 @@
 import os
 import platform
-
-import pyttsx
-import re
 import subprocess
 import time
 import webbrowser
+import re
+
+import pyttsx
 import speech_recognition as sr
 
 
-class Windows_commands(object):
+class WindowsCommands(object):
     def generate_sw_list(self):
         main_path = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
         directory = os.walk(main_path)
@@ -39,7 +39,7 @@ class Windows_commands(object):
         return os.popen2(command)
 
 
-class Linux_commands(object):
+class LinuxCommands(object):
     def generate_sw_list(self):
         tmp_name = '/tmp/software_list_tmp.txt'
         q, e = [], []
@@ -83,11 +83,7 @@ class Linux_commands(object):
             return os.popen2("amixer -D pulse sset Master " + str(number) + "%")
 
 
-class General_commands(object):
-
-    def __init__(self, recognizer):
-        self.recognizer = recognizer
-
+class GeneralCommands(object):
     def current_time(self):
         return time.strftime("%A %d of %b %Y year %H hours %M minutes")
 
@@ -118,17 +114,17 @@ class General_commands(object):
         search_string = google + "+".join(split_text)
         return webbrowser.open_new(search_string)
 
-    def what_to_do(self, recognize):
-        self.recognizer("Sorry, I don't know how to proceed with " + recognize)
-        self.recognizer("Let's search your question with google!")
-        return self.google_search(recognize)
+        # def what_to_do(self, speaker, recognized_text):
+        #     speaker("Sorry, I don't know how to proceed with " + recognized_text)
+        #     speaker("Let's search your question with google!")
+        #     return self.google_search(recognized_text)
 
-class Speaking():
 
+class Speaking(object):
     def __init__(self):
         self.engine = pyttsx.init()
 
-    def speak(self,text):
+    def speak(self, text):
         voices = self.engine.getProperty('voices')
         self.engine.setProperty('voice', voices[1].id)
         self.engine.setProperty('voice', 'english')
@@ -137,94 +133,94 @@ class Speaking():
         return self.engine.runAndWait()
 
 
-class Speach_recognize(object):
-
-    def __init__(self):
-        self.r = sr.Recognizer()
+class SpeechRecognize(object):
+    def recognize(self):
+        r = sr.Recognizer()
         with sr.Microphone() as source:
-            self.r.adjust_for_ambient_noise(source)
+            r.adjust_for_ambient_noise(source)
+            try:
+                audio = r.listen(source)
+                recognize = r.recognize_google(audio)
+                recognize_lower = recognize.lower()
+                return str(recognize_lower)
+            except sr.UnknownValueError:
+                pass
 
 
-            # while 1:
-            #     try:
-            #         .mainfunction(source)
-            #     except sr.UnknownValueError:
-            #         pass
-            # else:
-            #     pass
 
-class OS_info(object):
-
+class OsInfo(object):
     def get_os_type(self):
         return platform.system()
 
 
+class DecisionMaker(object):
+    def __init__(self, command):
+        self.command = command
+        self.speak = Speaking()
 
-class Decission_maker(object):
+    def decision(self, recognized_text, general_command, os_type):
+        if "mute" in recognized_text.split(" "):
+            self.command.mute_system()
+        elif "unmute" in recognized_text.split(" "):
+            self.command.unmute_system()
+        elif "calculator" in recognized_text.split(" "):
+            self.command.run_calculator()
+        elif recognized_text == "open google":
+            webbrowser.open_new("http://google.com")
+        elif recognized_text.startswith("search for"):
+            encode = "".join(recognized_text.encode("ascii", "ignore"))
+            general_command.google_search(encode.partition("search for")[2])
+        elif recognized_text == "exit":
+            exit()
+        elif "set volume" in recognized_text:
+            vol_encode = "".join(recognized_text.encode("ascii", "ignore"))
+            self.command.adjust_volume(re.findall('(\d)', vol_encode))
+        elif "time" in recognized_text:
+            self.speak.speak(general_command.current_time())
+        else:
+            comp = general_command.comparator(self.command.generate_sw_list(), recognized_text)
+            if len(comp) != 0 and os_type == "Linux":
+                self.speak.speak("Trying to run " + str(comp))
+                try:
+                    self.command.run_bash_command(comp)
+                except Exception:
+                    self.speak.speak("I had an exception. Can't proceed with your request.")
+            elif len(comp) != 0 and os_type == "Windows":
+                if len(comp) > 1:
+                    dictionary = dict()
+                    i = 0
+                    self.speak.speak("I have found several programs. Please choose one to run")
+                    for c in comp:
+                        i += 1
+                        print(str(i) + ":" + c.split("\\")[-1].split(".lnk")[0])
+                        dictionary[i] = c
+                    inp = input("Enter number: ")
+                    for key, value in dictionary.iteritems():
+                        if inp == key:
+                            os.popen2(value)
 
-
-    def __init__(self, commands):
-        self.commands = commands
-        self.recognizer = Speach_recognize()
-        self.genereal_commands = General_commands(self.recognizer)
-
-
-    # def decision(self, source):
-    #     audio = self.recognizer.r.listen(source)
-    #     recognize = self.recognizer.r.recognize_google(audio)
-    #     recognize_lower = recognize.lower()
-    #     if "mute" in recognize_lower.split(" "):
-    #         self.system.mute_system()
-    #     elif "unmute" in recognize_lower.split(" "):
-    #         self.system.unmute_system()
-    #     elif "calculator" in recognize_lower.split(" "):
-    #         self.system.run_calculator()
-    #     elif recognize_lower == "open google":
-    #         webbrowser.open_new("http://google.com")
-    #     elif recognize_lower.startswith("search for"):
-    #         encode = "".join(recognize.encode("ascii", "ignore"))
-    #         General_commands.google_search(encode.partition("search for")[2])
-    #     elif recognize_lower == "exit":
-    #         exit()
-    #     elif "set volume" in recognize_lower:
-    #         vol_encode = "".join(recognize.encode("ascii", "ignore"))
-    #         self.system.adjust_volume(re.findall('(\d)', vol_encode))
-    #     elif "time" in recognize_lower:
-    #         General_commands.speaking(self,self.current_time())
-    #     else:
-    #         comp = General_commands.comparator(self,self.system.generate_sw_list(), recognize_lower)
-    #         if comp != "" and self.__os == "Linux":
-    #             General_commands.speaking(self,"Trying to run " + str(comp))
-    #             try:
-    #                 self.system.run_bash_command(comp)
-    #             except Exception:
-    #                 General_commands.speaking(self,"I had an exception. Can't proceed with your request.")
-    #         elif comp != "" and self.__os == "Windows":
-    #             if len(comp) > 1:
-    #                 dictionary = dict()
-    #                 i = 0
-    #                 General_commands.speaking(self,"I have found several programs. Please choose one to run")
-    #                 for c in comp:
-    #                     i += 1
-    #                     print(str(i) + ":" + c.split("\\")[-1].split(".lnk")[0])
-    #                     dictionary[i] = c
-    #                 inp = input("Enter number: ")
-    #                 for key, value in dictionary.iteritems():
-    #                     if inp == key:
-    #                         os.popen2(value)
-    #
-    #             else:
-    #                 General_commands.speaking(self,"Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
-    #                 os.popen2(comp[0])
-    #         else:
-    #             General_commands.what_to_do(self,recognize)
-
+                else:
+                    self.speak.speak("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
+                    os.popen2(comp[0])
+            else:
+                speak.speak("I didn't found anything suitable program with request " + recognized_text)
+                speak.speak("Trying to find it in Google")
+                general_commands.google_search(recognized_text)
 
 
 if __name__ == '__main__':
-    _os = OS_info().get_os_type()
+    general_commands = GeneralCommands()
+    _os = OsInfo().get_os_type()
     if _os == "Linux":
-        commands = Linux_commands()
+        commands = LinuxCommands()
     elif _os == "Windows":
-        commands = Windows_commands()
-    decision = Decission_maker(commands)
+        commands = WindowsCommands()
+    else:
+        commands = False
+    decision = DecisionMaker(commands)
+    speak = Speaking()
+    listen = SpeechRecognize()
+    speak.speak("Start")
+    while True:
+        decision.decision(listen.recognize(), general_commands, _os)
+
