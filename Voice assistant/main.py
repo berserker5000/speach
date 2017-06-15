@@ -139,7 +139,7 @@ class SpeechRecognize(object):
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source)
             try:
-                audio = r.listen(source,phrase_time_limit=2,timeout=0)
+                audio = r.listen(source)
                 recognize = r.recognize_google(audio)
                 recognize_lower = recognize.lower()
                 return str(recognize_lower)
@@ -156,9 +156,8 @@ class OsInfo(object):
 class DecisionMaker(object):
     def __init__(self, command):
         self.command = command
-        self.speak = Speaking()
 
-    def decision(self, recognized_text, general_command, os_type):
+    def decision(self, recognized_text, speak, general_command, os_type):
         print type(recognized_text)
         if "mute" in recognized_text.split(" "):
             self.command.mute_system()
@@ -177,20 +176,20 @@ class DecisionMaker(object):
             vol_encode = "".join(recognized_text.encode("ascii", "ignore"))
             self.command.adjust_volume(re.findall('(\d)', vol_encode))
         elif "time" in recognized_text:
-            self.speak.speak(general_command.current_time())
+            speak.speak(general_command.current_time())
         else:
             comp = general_command.comparator(self.command.generate_sw_list(), recognized_text)
             if len(comp) != 0 and os_type == "Linux":
-                self.speak.speak("Trying to run " + str(comp))
+                speak.speak("Trying to run " + str(comp))
                 try:
                     self.command.run_bash_command(comp)
                 except Exception:
-                    self.speak.speak("I had an exception. Can't proceed with your request.")
+                    speak.speak("I had an exception. Can't proceed with your request.")
             elif len(comp) != 0 and os_type == "Windows":
                 if len(comp) > 1:
                     dictionary = dict()
                     i = 0
-                    self.speak.speak("I have found several programs. Please choose one to run")
+                    speak.speak("I have found several programs. Please choose one to run")
                     for c in comp:
                         i += 1
                         print(str(i) + ":" + c.split("\\")[-1].split(".lnk")[0])
@@ -201,7 +200,7 @@ class DecisionMaker(object):
                             os.popen2(value)
 
                 else:
-                    self.speak.speak("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
+                    speak.speak("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
                     os.popen2(comp[0])
             else:
                 speak.speak("I didn't found anything suitable program with request " + recognized_text)
@@ -224,7 +223,7 @@ if __name__ == '__main__':
     speak.speak("Start")
     while True:
         try:
-            decision.decision(listen.recognize(), general_commands, _os)
+            decision.decision(listen.recognize(),speak, general_commands, _os)
         except AttributeError:
             pass
 
