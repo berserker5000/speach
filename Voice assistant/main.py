@@ -147,7 +147,6 @@ class SpeechRecognize(object):
                 pass
 
 
-
 class OsInfo(object):
     def get_os_type(self):
         return platform.system()
@@ -223,7 +222,6 @@ if __name__ == '__main__':
     speak.speak("Start")
     while True:
         try:
-            decision.decision(listen.recognize(),speak, general_commands, _os)
+            decision.decision(listen.recognize(), speak, general_commands, _os)
         except AttributeError:
             pass
-
