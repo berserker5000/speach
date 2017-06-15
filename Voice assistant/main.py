@@ -11,10 +11,16 @@ import speech_recognition as sr
 
 class DataBase(object):
     def __init__(self):
-        pass
-    def get_commands(self):
-        pass
+        self.conn = sqlite3.connect(database="database.db")
+        self.c = self.conn.cursor()
+    def get_commands(self, text, OperationSystem):
+        self.t = text.split(" ")
+        for word in self.t:
+            for value in self.c.execute("SELECT " + OperationSystem +" FROM General WHERE Text="+"'"+str(word)+"'"):
+                if value[0] != None:
+                    print(value[0])
     def add_commands(self):
+        # Insert a row of data c.execute("INSERT INTO stocks VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
         pass
 
 
@@ -166,7 +172,6 @@ class DecisionMaker(object):
         self.command = command
 
     def decision(self, recognized_text, speak, general_command, os_type):
-        print type(recognized_text)
         if "mute" in recognized_text.split(" "):
             self.command.mute_system()
         elif "unmute" in recognized_text.split(" "):
@@ -218,9 +223,11 @@ class DecisionMaker(object):
 
 if __name__ == '__main__':
     general_commands = GeneralCommands()
+    db = DataBase()
     _os = OsInfo().get_os_type()
     if _os == "Linux":
         commands = LinuxCommands()
+        #commands = db.get_commands(_os, "General")
     elif _os == "Windows":
         commands = WindowsCommands()
     else:
@@ -228,9 +235,13 @@ if __name__ == '__main__':
     decision = DecisionMaker(commands)
     speak = Speaking()
     listen = SpeechRecognize()
+
+    #db.get_commands(OperationSystem=_os, text=listen.recognize())
+
     speak.speak("Start")
     while True:
         try:
             decision.decision(listen.recognize(), speak, general_commands, _os)
+            # decision.decision(listen.recognize(), speak, db.get_commands(_os, "General"), _os)
         except AttributeError:
             pass
