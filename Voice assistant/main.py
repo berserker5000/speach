@@ -4,9 +4,18 @@ import subprocess
 import time
 import webbrowser
 import re
-
+import sqlite3
 import pyttsx
 import speech_recognition as sr
+
+
+class DataBase(object):
+    def __init__(self):
+        pass
+    def get_commands(self):
+        pass
+    def add_commands(self):
+        pass
 
 
 class WindowsCommands(object):
