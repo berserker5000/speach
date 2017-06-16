@@ -5,6 +5,7 @@ import time
 import webbrowser
 import re
 import sqlite3
+
 import pyttsx
 import speech_recognition as sr
 
@@ -13,15 +14,20 @@ class DataBase(object):
     def __init__(self):
         self.conn = sqlite3.connect(database="database.db")
         self.c = self.conn.cursor()
+
     def get_commands(self, text, OperationSystem):
         self.t = text.split(" ")
         for word in self.t:
-            for value in self.c.execute("SELECT " + OperationSystem +" FROM General WHERE Text="+"'"+str(word)+"'"):
+            for value in self.c.execute("SELECT " + OperationSystem + " FROM General WHERE Text=" + "'" + str(
+                    word) + "'"):
                 if value[0] != None:
                     print(value[0])
-    def add_commands(self):
-        # Insert a row of data c.execute("INSERT INTO stocks VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
-        pass
+
+    def add_commands(self, text, command, OperationSystem):
+        self.c.execute("insert into General("+OperationSystem+",Text) values ('"+command+"\',\'"+text+"')")
+        return self.conn.commit()
+
+
 
 
 class WindowsCommands(object):
@@ -227,7 +233,7 @@ if __name__ == '__main__':
     _os = OsInfo().get_os_type()
     if _os == "Linux":
         commands = LinuxCommands()
-        #commands = db.get_commands(_os, "General")
+        # commands = db.get_commands(_os, "General")
     elif _os == "Windows":
         commands = WindowsCommands()
     else:
@@ -236,8 +242,8 @@ if __name__ == '__main__':
     speak = Speaking()
     listen = SpeechRecognize()
 
-    #db.get_commands(OperationSystem=_os, text=listen.recognize())
-
+    # db.get_commands(OperationSystem=_os, text=listen.recognize())
+    # db.add_commands("unmute system","nircmd unmute system", _os)
     speak.speak("Start")
     while True:
         try:
