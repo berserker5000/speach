@@ -24,10 +24,8 @@ class DataBase(object):
                     print(value[0])
 
     def add_commands(self, text, command, OperationSystem):
-        self.c.execute("insert into General("+OperationSystem+",Text) values ('"+command+"\',\'"+text+"')")
+        self.c.execute("insert into General(" + OperationSystem + ",Text) values ('" + command + "\',\'" + text + "')")
         return self.conn.commit()
-
-
 
 
 class WindowsCommands(object):
