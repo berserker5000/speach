@@ -23,7 +23,8 @@ class DataBase(object):
                 if value[0] != None:
                     print(value[0])
 
-    def add_commands(self, text, command, OperationSystem):
+    def add_commands(self, text, OperationSystem):
+        command = raw_input("Please, enter command what to do: \n")
         self.c.execute("insert into General(" + OperationSystem + ",Text) values ('" + command + "\',\'" + text + "')")
         return self.conn.commit()
 
@@ -80,12 +81,11 @@ class LinuxCommands(object):
 
         for i in e:
             w.add(i[0])
-
+        q, e = None, None
         return w
 
     def run_bash_command(self, command):
-        process = subprocess.check_output(['bash', '-c', command])
-        return process
+        return subprocess.check_output(['bash', '-c', command])
 
     def mute_system(self):
         return os.popen2("amixer -D pulse sset Master mute")
@@ -132,6 +132,9 @@ class GeneralCommands(object):
         google = "http://google.com#q="
         search_string = google + "+".join(split_text)
         return webbrowser.open_new(search_string)
+
+    def run_command(self, command):
+        return os.popen2(command)
 
         # def what_to_do(self, speaker, recognized_text):
         #     speaker("Sorry, I don't know how to proceed with " + recognized_text)
@@ -211,7 +214,11 @@ class DecisionMaker(object):
                         i += 1
                         print(str(i) + ":" + c.split("\\")[-1].split(".lnk")[0])
                         dictionary[i] = c
-                    inp = input("Enter number: ")
+                    try:
+                        inp = input("Enter number: ")
+                    except Exception:
+                        print ("Please, enter a valid number.")
+                        inp = input("Enter number: ")
                     for key, value in dictionary.iteritems():
                         if inp == key:
                             os.popen2(value)
@@ -229,9 +236,9 @@ if __name__ == '__main__':
     general_commands = GeneralCommands()
     db = DataBase()
     _os = OsInfo().get_os_type()
+    # commands = db.get_commands(listen.recognize(), _os)
     if _os == "Linux":
         commands = LinuxCommands()
-        # commands = db.get_commands(_os, "General")
     elif _os == "Windows":
         commands = WindowsCommands()
     else:
@@ -239,13 +246,14 @@ if __name__ == '__main__':
     decision = DecisionMaker(commands)
     speak = Speaking()
     listen = SpeechRecognize()
-
-    # db.get_commands(OperationSystem=_os, text=listen.recognize())
-    # db.add_commands("unmute system","nircmd unmute system", _os)
+    # db.add_commands(listen.recognize(), _os)
     speak.speak("Start")
     while True:
         try:
             decision.decision(listen.recognize(), speak, general_commands, _os)
-            # decision.decision(listen.recognize(), speak, db.get_commands(_os, "General"), _os)
         except AttributeError:
             pass
+
+# TODO: Add multithreading
+# TODO: Add face recognition
+# TODO: make all commands in db and take them from db
