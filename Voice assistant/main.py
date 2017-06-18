@@ -235,7 +235,7 @@ class DecisionMaker(object):
 if __name__ == '__main__':
     general_commands = GeneralCommands()
     db = DataBase()
-    _os = OsInfo().get_os_type()
+    _os = OsInfo()
     # commands = db.get_commands(listen.recognize(), _os)
     if _os == "Linux":
         commands = LinuxCommands()
