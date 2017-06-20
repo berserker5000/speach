@@ -1,27 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="2117103961">
-    <data-source source="LOCAL" name="SQLite -" uuid="1e3675fd-10f0-4118-9e63-ba0aa9332048">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/Voice assistant/database.db</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="database" uuid="b267a65a-49f4-4569-9ef4-815705f92075">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <imported>true</imported>
-      <remarks>SQLite</remarks>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/Voice assistant/database.db</jdbc-url>
-      <libraries>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/xerial-sqlite-license.txt</url>
-        </library>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/sqlite-jdbc-3.8.11.2.jar</url>
-        </library>
-      </libraries>
-    </data-source>
-  </component>
-</project>
+<project version="4" />
