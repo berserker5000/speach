@@ -197,6 +197,12 @@ class DecisionMaker(object):
     def __init__(self, command):
         self.command = command
 
+        self.general_commands = GeneralCommands()
+        self.db = DataBase()
+        self.os = OsInfo().get_os_type()
+        self.text = SpeechRecognize().recognize()
+        # self.command = db.get_commands(self.text, self.os)
+
     def decision(self, recognized_text, speak, general_command, os_type):
         if "mute" in recognized_text.split(" "):
             self.command.mute_system()
@@ -250,12 +256,16 @@ class DecisionMaker(object):
                 speak.speak("Trying to find it in Google")
                 general_commands.google_search(recognized_text)
 
+    def decision2(self,os, text, speak):
+        pass
+
+
 
 if __name__ == '__main__':
     general_commands = GeneralCommands()
     db = DataBase()
     _os = OsInfo().get_os_type()
-    # commands = db.get_commands(listen.recognize(), _os)
+    # commands = db.get_commands("mute", _os)
     if _os == "Linux":
         commands = LinuxCommands()
     elif _os == "Windows":
