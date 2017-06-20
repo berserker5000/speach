@@ -29,6 +29,24 @@ class DataBase(object):
         self.c.execute("insert into General(Command, OS,Text) values ('" + command + "\',\'" +OperationSystem+"\',\'"  + text + "')")
         return self.conn.commit()
 
+    def list_commands(self, OperationSystem):
+        list_command={}
+        i = 0
+        for value in  self.c.execute("Select text, Command FROM General WHERE OS='"+OperationSystem+"'"):
+            if value[0] != None:
+                list_command[str(value[0])] = str(value[1])
+        for value in list_command.keys():
+            i+=1
+            print i,":",value
+        return True
+
+    def remove_command(self, os, text):
+        text_low = str(text).lower()
+        self.c.execute("delete FROM General WHERE OS='"+str(os)+"' AND Text='"+text_low+"'")
+        return self.conn.commit()
+
+
+
 
 class WindowsCommands(object):
     def generate_sw_list(self):
@@ -245,10 +263,14 @@ if __name__ == '__main__':
     else:
         exit()
     decision = DecisionMaker(commands)
-    speak = Speaking()
-    listen = SpeechRecognize()
+    db.list_commands(_os)
+
+    db.remove_command(_os,"copy")
     # db.add_commands(listen.recognize(), _os)
     # db.get_commands(listen.recognize(), _os)
+    speak = Speaking()
+    listen = SpeechRecognize()
+
     speak.speak("Start")
     while True:
         try:
