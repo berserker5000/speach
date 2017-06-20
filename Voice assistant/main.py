@@ -18,14 +18,15 @@ class DataBase(object):
     def get_commands(self, text, OperationSystem):
         self.t = text.split(" ")
         for word in self.t:
-            for value in self.c.execute("SELECT " + OperationSystem + " FROM General WHERE Text=" + "'" + str(
-                    word) + "'"):
+            for value in self.c.execute("SELECT Command FROM General WHERE Text=" + "'" + str(word) + "'" + "and OS='"+str(OperationSystem)+"'"):
                 if value[0] != None:
-                    print(value[0])
+                    return (value[0])
+                else:
+                    return False
 
     def add_commands(self, text, OperationSystem):
         command = raw_input("Please, enter command what to do: \n")
-        self.c.execute("insert into General(" + OperationSystem + ",Text) values ('" + command + "\',\'" + text + "')")
+        self.c.execute("insert into General(Command, OS,Text) values ('" + command + "\',\'" +OperationSystem+"\',\'"  + text + "')")
         return self.conn.commit()
 
 
@@ -235,18 +236,19 @@ class DecisionMaker(object):
 if __name__ == '__main__':
     general_commands = GeneralCommands()
     db = DataBase()
-    _os = OsInfo()
+    _os = OsInfo().get_os_type()
     # commands = db.get_commands(listen.recognize(), _os)
     if _os == "Linux":
         commands = LinuxCommands()
     elif _os == "Windows":
         commands = WindowsCommands()
     else:
-        commands = False
+        exit()
     decision = DecisionMaker(commands)
     speak = Speaking()
     listen = SpeechRecognize()
     # db.add_commands(listen.recognize(), _os)
+    # db.get_commands(listen.recognize(), _os)
     speak.speak("Start")
     while True:
         try:
