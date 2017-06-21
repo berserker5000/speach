@@ -10,9 +10,11 @@ import pyttsx
 import speech_recognition as sr
 
 
+_os = platform.system()
+
 class DataBase(object):
     def __init__(self):
-        self.conn = sqlite3.connect(database="database.db")
+        self.conn = sqlite3.connect(database="database.db",timeout=30)
         self.c = self.conn.cursor()
 
     def get_commands(self, text, OperationSystem):
@@ -26,9 +28,10 @@ class DataBase(object):
                     return False
 
     def add_commands(self, text, OperationSystem):
+        text_low = str(text).lower()
         command = raw_input("Please, enter command what to do: \n")
         self.c.execute(
-            "insert into General(Command, OS,Text) values ('" + command + "\',\'" + OperationSystem + "\',\'" + text + "')")
+            "insert into General(Command, OS,Text) values ('" + command + "\',\'" + OperationSystem + "\',\'" + text_low + "')")
         return self.conn.commit()
 
     def list_commands(self, OperationSystem):
@@ -44,6 +47,7 @@ class DataBase(object):
 
     def remove_command(self, os, text):
         text_low = str(text).lower()
+        self.conn.cursor()
         self.c.execute("delete FROM General WHERE OS='" + str(os) + "' AND Text='" + text_low + "'")
         return self.conn.commit()
 
@@ -59,14 +63,14 @@ class WindowsCommands(object):
                     names[f.split(".lnk")[0].lower()] = ('"' + root + "\\" + f + '"')
         return names
 
-    def mute_system(self):
-        return os.popen2("nircmd.exe mutesysvolume 1")
-
-    def unmute_system(self):
-        return os.popen2("nircmd.exe mutesysvolume 0")
-
-    def run_calculator(self):
-        return os.popen2("calc")
+    # def mute_system(self):
+    #     return os.popen2("nircmd.exe mutesysvolume 1")
+    #
+    # def unmute_system(self):
+    #     return os.popen2("nircmd.exe mutesysvolume 0")
+    #
+    # def run_calculator(self):
+    #     return os.popen2("calc")
 
     def adjust_volume(self, number):
         if type(number) == list:
@@ -74,8 +78,13 @@ class WindowsCommands(object):
             num = (int(number) * 65535) / 100
             return os.popen2("nircmd.exe setsysvolume " + str(num))
 
-    def run_bash_command(self, command):
-        return os.popen2(command)
+    # def run_bash_command(self, command):
+    #     return os.popen2(command)
+
+
+class RunProgram(object):
+    def __init__(self, command):
+        os.popen2(str(command))
 
 
 class LinuxCommands(object):
@@ -103,17 +112,17 @@ class LinuxCommands(object):
         q, e = None, None
         return w
 
-    def run_bash_command(self, command):
-        return subprocess.check_output(['bash', '-c', command])
+    # def run_bash_command(self, command):
+    #     return subprocess.check_output(['bash', '-c', command])
 
-    def mute_system(self):
-        return os.popen2("amixer -D pulse sset Master mute")
+    # def mute_system(self):
+    #     return os.popen2("amixer -D pulse sset Master mute")
 
-    def unmute_system(self):
-        return os.popen2("amixer -D pulse sset Master unmute")
+    # def unmute_system(self):
+    #     return os.popen2("amixer -D pulse sset Master unmute")
 
-    def run_calculator(self):
-        return os.popen2("gnome-calculator")
+    # def run_calculator(self):
+    #     return os.popen2("gnome-calculator")
 
     def adjust_volume(self, number):
         if type(number) == list:
@@ -152,8 +161,8 @@ class GeneralCommands(object):
         search_string = google + "+".join(split_text)
         return webbrowser.open_new(search_string)
 
-    def run_command(self, command):
-        return os.popen2(command)
+    # def run_command(self, command):
+    #     return os.popen2(command)
 
         # def what_to_do(self, speaker, recognized_text):
         #     speaker("Sorry, I don't know how to proceed with " + recognized_text)
@@ -188,19 +197,19 @@ class SpeechRecognize(object):
                 pass
 
 
-class OsInfo(object):
-    def get_os_type(self):
-        return platform.system()
+# class OsInfo(object):
+#     def get_os_type(self):
+#         return platform.system()
 
 
 class DecisionMaker(object):
     def __init__(self, command):
         self.command = command
 
-        self.general_commands = GeneralCommands()
-        self.db = DataBase()
-        self.os = OsInfo().get_os_type()
-        self.text = SpeechRecognize().recognize()
+        # self.general_commands = GeneralCommands()
+        # self.db = DataBase()
+        self.os = platform.system()
+        # self.text = SpeechRecognize().recognize()
         # self.command = db.get_commands(self.text, self.os)
 
     def decision(self, recognized_text, speak, general_command, os_type):
@@ -256,37 +265,37 @@ class DecisionMaker(object):
                 speak.speak("Trying to find it in Google")
                 general_commands.google_search(recognized_text)
 
-    def decision2(self, os, text, speak):
+    def decision2(self):
         pass
 
 
 if __name__ == '__main__':
     general_commands = GeneralCommands()
     db = DataBase()
-    _os = OsInfo().get_os_type()
+
     # commands = db.get_commands("mute", _os)
     if _os == "Linux":
         commands = LinuxCommands()
     elif _os == "Windows":
         commands = WindowsCommands()
-    else:
-        exit()
+
     decision = DecisionMaker(commands)
     db.list_commands(_os)
+    db.add_commands("copy", _os)
+    db.remove_command(os, "copy")
 
-    db.remove_command(_os, "copy")
-    # db.add_commands(listen.recognize(), _os)
     # db.get_commands(listen.recognize(), _os)
-    speak = Speaking()
-    listen = SpeechRecognize()
+    # speak = Speaking()
+    # listen = SpeechRecognize()
 
-    speak.speak("Start")
-    while True:
-        try:
-            decision.decision(listen.recognize(), speak, general_commands, _os)
-        except AttributeError:
-            pass
+    # speak.speak("Start")
+    # while True:
+    #     try:
+    #         decision.decision(listen.recognize(), speak, general_commands, _os)
+    #     except AttributeError:
+    #         pass
 
 # TODO: Add multithreading
 # TODO: Add face recognition
-# TODO: make all commands in db and take them from db
+#TODO: Make administration posibility
+#TODO: Make "access point" for administrating
