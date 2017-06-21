@@ -1,20 +1,32 @@
 import os
 import platform
+import re
+import sqlite3
 import subprocess
 import time
 import webbrowser
-import re
-import sqlite3
 
 import pyttsx
 import speech_recognition as sr
 
-
 _os = platform.system()
+
+
+class SynonimList(object):
+    def open(self):
+        op = ["open", "run", "start", "do"]
+        return op
+
+    def close(self):
+        pass
+
+    def remove(self):
+        pass
+
 
 class DataBase(object):
     def __init__(self):
-        self.conn = sqlite3.connect(database="database.db",timeout=30)
+        self.conn = sqlite3.connect(database="database.db", timeout=30)
         self.c = self.conn.cursor()
 
     def get_commands(self, text, OperationSystem):
@@ -43,7 +55,7 @@ class DataBase(object):
 
     def indexed_commands(self):
         indexed_commands = {}
-        i=0
+        i = 0
         for value in self.list_command.keys():
             i += 1
             indexed_commands[i] = value
@@ -82,8 +94,8 @@ class WindowsCommands(object):
             num = (int(number) * 65535) / 100
             return os.popen2("nircmd.exe setsysvolume " + str(num))
 
-    # def run_bash_command(self, command):
-    #     return os.popen2(command)
+            # def run_bash_command(self, command):
+            #     return os.popen2(command)
 
 
 class RunProgram(object):
@@ -165,8 +177,8 @@ class GeneralCommands(object):
         search_string = google + "+".join(split_text)
         return webbrowser.open_new(search_string)
 
-    # def run_command(self, command):
-    #     return os.popen2(command)
+        # def run_command(self, command):
+        #     return os.popen2(command)
 
         # def what_to_do(self, speaker, recognized_text):
         #     speaker("Sorry, I don't know how to proceed with " + recognized_text)
@@ -210,11 +222,10 @@ class DecisionMaker(object):
     def __init__(self, command):
         self.command = command
 
-        # self.general_commands = GeneralCommands()
-        # self.db = DataBase()
-        self.os = platform.system()
-        # self.text = SpeechRecognize().recognize()
-        # self.command = db.get_commands(self.text, self.os)
+        self.general_commands = GeneralCommands()
+        self.db = DataBase()
+        self.text = SpeechRecognize().recognize()
+        self.command = db.get_commands(self.text, self.os)
 
     def decision(self, recognized_text, speak, general_command, os_type):
         if "mute" in recognized_text.split(" "):
@@ -274,31 +285,17 @@ class DecisionMaker(object):
 
 
 if __name__ == '__main__':
-    #general_commands = GeneralCommands()
+    # general_commands = GeneralCommands()
     db = DataBase()
-    # commands = db.get_commands("mute", _os)
-    # if _os == "Linux":
-    #     commands = LinuxCommands()
-    # elif _os == "Windows":
-    #     commands = WindowsCommands()
-    #
-    # decision = DecisionMaker(commands)
+    print db.get_commands("mute", _os)
+
     db.list_commands(_os)
-    db.add_commands("copy", _os)
-    db.remove_command(os, "copy")
+    # db.add_commands("copy", _os)
+    # db.remove_command(os, "copy")
 
-    # db.get_commands(listen.recognize(), _os)
-    # speak = Speaking()
-    # listen = SpeechRecognize()
 
-    # speak.speak("Start")
-    # while True:
-    #     try:
-    #         decision.decision(listen.recognize(), speak, general_commands, _os)
-    #     except AttributeError:
-    #         pass
 
-# TODO: Add multithreading
-# TODO: Add face recognition
-#TODO: Make administration posibility
-#TODO: Make "access point" for administrating
+    # TODO: Add multithreading
+    # TODO: Add face recognition
+    # TODO: Make administration posibility
+    # TODO: Make "access point" for administrating
