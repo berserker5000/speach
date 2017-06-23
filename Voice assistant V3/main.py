@@ -18,10 +18,12 @@ class SynonimList(object):
         return op
 
     def close(self):
-        pass
+        cl = ["close", "exit from", "exit", "leave"]
+        return cl
 
     def remove(self):
-        pass
+        rm = ["remove", "delete", "wipe", "clean"]
+        return rm
 
 
 class DataBase(object):
