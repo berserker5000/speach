@@ -227,7 +227,7 @@ class DecisionMaker(object):
         self.general_commands = GeneralCommands()
         self.db = DataBase()
         self.text = SpeechRecognize().recognize()
-        self.command = db.get_commands(self.text, self.os)
+        self.command = db.get_commands(self.text, _os)
 
     def decision(self, recognized_text, speak, general_command, os_type):
         if "mute" in recognized_text.split(" "):
@@ -289,9 +289,9 @@ class DecisionMaker(object):
 if __name__ == '__main__':
     # general_commands = GeneralCommands()
     db = DataBase()
-    print db.get_commands("mute", _os)
+    # db.get_commands("mute", _os)
 
-    db.list_commands(_os)
+    # db.list_commands(_os)
     # db.add_commands("copy", _os)
     # db.remove_command(os, "copy")
 
