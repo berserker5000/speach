@@ -201,7 +201,7 @@ class DecisionMaker(object):
         self.db = DataBase()
         self.os = OsInfo().get_os_type()
         self.text = SpeechRecognize().recognize()
-        # self.command = db.get_commands(self.text, self.os)
+        self.command = db.get_commands(self.text, self.os)
 
     def decision(self, recognized_text, speak, general_command, os_type):
         if "mute" in recognized_text.split(" "):
