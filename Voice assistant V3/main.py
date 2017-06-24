@@ -1,19 +1,36 @@
 import os
 import platform
+import re
+import sqlite3
 import subprocess
 import time
 import webbrowser
-import re
-import sqlite3
 
 import pyttsx
 import speech_recognition as sr
 
+_os = platform.system()
+
+
+class SynonimList(object):
+    def open(self):
+        op = ["open", "run", "start", "do"]
+        return op
+
+    def close(self):
+        cl = ["close", "exit from", "exit", "leave"]
+        return cl
+
+    def remove(self):
+        rm = ["remove", "delete", "wipe", "clean"]
+        return rm
+
 
 class DataBase(object):
     def __init__(self):
-        self.conn = sqlite3.connect(database="database.db")
+        self.conn = sqlite3.connect(database="database.db", timeout=30)
         self.c = self.conn.cursor()
+        self.fillin_tables()
 
     def get_commands(self, text, OperationSystem):
         self.t = text.split(" ")
@@ -26,26 +43,60 @@ class DataBase(object):
                     return False
 
     def add_commands(self, text, OperationSystem):
+        text_low = str(text).lower()
         command = raw_input("Please, enter command what to do: \n")
         self.c.execute(
-            "insert into General(Command, OS,Text) values ('" + command + "\',\'" + OperationSystem + "\',\'" + text + "')")
+            "insert into General(Command, OS,Text) values ('" + command + "\',\'" + OperationSystem + "\',\'" + text_low + "')")
         return self.conn.commit()
 
     def list_commands(self, OperationSystem):
-        list_command = {}
-        i = 0
+        self.list_command = {}
         for value in self.c.execute("Select text, Command FROM General WHERE OS='" + OperationSystem + "'"):
             if value[0] != None:
-                list_command[str(value[0])] = str(value[1])
-        for value in list_command.keys():
+                self.list_command[str(value[0])] = str(value[1])
+        return self.list_command
+
+    def indexed_commands(self):
+        indexed_commands = {}
+        i = 0
+        for value in self.list_command.keys():
             i += 1
-            print i, ":", value
-        return True
+            indexed_commands[i] = value
+        return indexed_commands
 
     def remove_command(self, os, text):
         text_low = str(text).lower()
+        self.conn.cursor()
         self.c.execute("delete FROM General WHERE OS='" + str(os) + "' AND Text='" + text_low + "'")
         return self.conn.commit()
+
+    def get_text(self, os):
+        text = set()
+        for value in self.c.execute("SELECT Text FROM General WHERE OS='" + os + "'"):
+            text.add(value[0].encode("utf-8", "ignore"))
+        return text
+
+    def list_db_tables(self):
+        x = self.c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        y = set()
+        for i in x.fetchall():
+            y.add(i[0].encode("utf-8"))
+        return y
+
+    def fillin_tables(self):
+        if _os == "Windows":
+            self.c.execute("DELETE FROM WindowsSoftware")
+            for key, value in WindowsCommands().generate_sw_list().iteritems():
+                self.c.execute("insert INTO WindowsSoftware VALUES ('" + key + "\',\'" + str(value) + "')")
+            return self.conn.commit()
+        elif _os == "Linux":
+            self.c.execute("DELETE FROM LinuxSoftware")
+            for value in LinuxCommands().generate_sw_list():
+                self.c.execute("insert INTO LinuxSoftware VALUES ('" + str(value) + "\',\'" + str(value) + "')")
+            return self.conn.commit()
+        else:
+            print("Unknown operation system")
+            exit()
 
 
 class WindowsCommands(object):
@@ -59,23 +110,16 @@ class WindowsCommands(object):
                     names[f.split(".lnk")[0].lower()] = ('"' + root + "\\" + f + '"')
         return names
 
-    def mute_system(self):
-        return os.popen2("nircmd.exe mutesysvolume 1")
-
-    def unmute_system(self):
-        return os.popen2("nircmd.exe mutesysvolume 0")
-
-    def run_calculator(self):
-        return os.popen2("calc")
-
     def adjust_volume(self, number):
         if type(number) == list:
             number = "".join(number)
             num = (int(number) * 65535) / 100
             return os.popen2("nircmd.exe setsysvolume " + str(num))
 
-    def run_bash_command(self, command):
-        return os.popen2(command)
+
+class RunProgram(object):
+    def __init__(self, command):
+        os.popen2(str(command))
 
 
 class LinuxCommands(object):
@@ -102,18 +146,6 @@ class LinuxCommands(object):
             w.add(i[0])
         q, e = None, None
         return w
-
-    def run_bash_command(self, command):
-        return subprocess.check_output(['bash', '-c', command])
-
-    def mute_system(self):
-        return os.popen2("amixer -D pulse sset Master mute")
-
-    def unmute_system(self):
-        return os.popen2("amixer -D pulse sset Master unmute")
-
-    def run_calculator(self):
-        return os.popen2("gnome-calculator")
 
     def adjust_volume(self, number):
         if type(number) == list:
@@ -152,13 +184,10 @@ class GeneralCommands(object):
         search_string = google + "+".join(split_text)
         return webbrowser.open_new(search_string)
 
-    def run_command(self, command):
-        return os.popen2(command)
-
-        # def what_to_do(self, speaker, recognized_text):
-        #     speaker("Sorry, I don't know how to proceed with " + recognized_text)
-        #     speaker("Let's search your question with google!")
-        #     return self.google_search(recognized_text)
+    def what_to_do(self, speaker, recognized_text):
+        speaker("Sorry, I don't know how to proceed with " + recognized_text)
+        speaker("Let's search your question with google!")
+        return self.google_search(recognized_text)
 
 
 class Speaking(object):
@@ -188,14 +217,13 @@ class SpeechRecognize(object):
                 pass
 
 
-class OsInfo(object):
-    def get_os_type(self):
-        return platform.system()
-
-
 class DecisionMaker(object):
-    def __init__(self, command):
-        self.command = command
+    def __init__(self):
+
+        self.general_commands = GeneralCommands()
+        self.db = DataBase()
+        self.speach = SpeechRecognize()
+        self.speack = Speaking()
 
     def decision(self, recognized_text, speak, general_command, os_type):
         if "mute" in recognized_text.split(" "):
@@ -248,26 +276,27 @@ class DecisionMaker(object):
             else:
                 speak.speak("I didn't found anything suitable program with request " + recognized_text)
                 speak.speak("Trying to find it in Google")
-                general_commands.google_search(recognized_text)
+                general_command.google_search(recognized_text)
 
+    def decision2(self):
+        try:
+            self.speack.speak("Listening...")
+            text = self.speach.recognize()
+            text_in_db = self.db.get_text(_os)
+            splited_text = text.split(" ")
+            for value in text_in_db:
+                for word in splited_text:
+                    if (word in value) or (value in word):
+                        RunProgram(self.db.get_commands(value, _os))
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':
-    general_commands = GeneralCommands()
-    db = DataBase()
-    _os = OsInfo().get_os_type()
-    if _os == "Linux":
-        commands = LinuxCommands()
-    elif _os == "Windows":
-        commands = WindowsCommands()
-    else:
-        exit()
-    decision = DecisionMaker(commands)
-    speak = Speaking()
-    listen = SpeechRecognize()
-    speak.speak("Start")
+    des = DecisionMaker()
     while True:
-        try:
-            decision.decision(listen.recognize(), speak, general_commands, _os)
-        except AttributeError:
-            pass
+        des.decision2()
+
+    # TODO: Add face recognition
+    # TODO: Make administration posibility
+    # TODO: Make "access point" for administrating

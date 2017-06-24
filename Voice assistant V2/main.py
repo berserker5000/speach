@@ -10,44 +10,6 @@ import pyttsx
 import speech_recognition as sr
 
 
-class DataBase(object):
-    def __init__(self):
-        self.conn = sqlite3.connect(database="database.db")
-        self.c = self.conn.cursor()
-
-    def get_commands(self, text, OperationSystem):
-        self.t = text.split(" ")
-        for word in self.t:
-            for value in self.c.execute("SELECT Command FROM General WHERE Text=" + "'" + str(
-                    word) + "'" + "and OS='" + str(OperationSystem) + "'"):
-                if value[0] != None:
-                    return (value[0])
-                else:
-                    return False
-
-    def add_commands(self, text, OperationSystem):
-        command = raw_input("Please, enter command what to do: \n")
-        self.c.execute(
-            "insert into General(Command, OS,Text) values ('" + command + "\',\'" + OperationSystem + "\',\'" + text + "')")
-        return self.conn.commit()
-
-    def list_commands(self, OperationSystem):
-        list_command = {}
-        i = 0
-        for value in self.c.execute("Select text, Command FROM General WHERE OS='" + OperationSystem + "'"):
-            if value[0] != None:
-                list_command[str(value[0])] = str(value[1])
-        for value in list_command.keys():
-            i += 1
-            print i, ":", value
-        return True
-
-    def remove_command(self, os, text):
-        text_low = str(text).lower()
-        self.c.execute("delete FROM General WHERE OS='" + str(os) + "' AND Text='" + text_low + "'")
-        return self.conn.commit()
-
-
 class WindowsCommands(object):
     def generate_sw_list(self):
         main_path = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
@@ -197,12 +159,6 @@ class DecisionMaker(object):
     def __init__(self, command):
         self.command = command
 
-        self.general_commands = GeneralCommands()
-        self.db = DataBase()
-        self.os = OsInfo().get_os_type()
-        self.text = SpeechRecognize().recognize()
-        self.command = db.get_commands(self.text, self.os)
-
     def decision(self, recognized_text, speak, general_command, os_type):
         if "mute" in recognized_text.split(" "):
             self.command.mute_system()
@@ -256,15 +212,11 @@ class DecisionMaker(object):
                 speak.speak("Trying to find it in Google")
                 general_commands.google_search(recognized_text)
 
-    def decision2(self, os, text, speak):
-        pass
 
 
 if __name__ == '__main__':
     general_commands = GeneralCommands()
-    db = DataBase()
     _os = OsInfo().get_os_type()
-    # commands = db.get_commands("mute", _os)
     if _os == "Linux":
         commands = LinuxCommands()
     elif _os == "Windows":
@@ -272,21 +224,11 @@ if __name__ == '__main__':
     else:
         exit()
     decision = DecisionMaker(commands)
-    db.list_commands(_os)
-
-    db.remove_command(_os, "copy")
-    # db.add_commands(listen.recognize(), _os)
-    # db.get_commands(listen.recognize(), _os)
     speak = Speaking()
     listen = SpeechRecognize()
-
     speak.speak("Start")
     while True:
         try:
             decision.decision(listen.recognize(), speak, general_commands, _os)
         except AttributeError:
             pass
-
-# TODO: Add multithreading
-# TODO: Add face recognition
-# TODO: make all commands in db and take them from db
