@@ -32,26 +32,36 @@ class DataBase(object):
         self.c = self.conn.cursor()
         self.fillin_tables()
 
-    def get_commands(self, text, OperationSystem):
-        self.t = text.split(" ")
-        for word in self.t:
+    def get_commands(self, text):
+        for word in text.split(" "):
             for value in self.c.execute("SELECT Command FROM General WHERE Text=" + "'" + str(
-                    word) + "'" + "and OS='" + str(OperationSystem) + "'"):
+                    word) + "'" + "and OS='" + str(_os) + "'"):
                 if value[0] != None:
                     return (value[0])
                 else:
                     return False
 
-    def add_commands(self, text, OperationSystem):
+    # def get_os_software(self):
+    #     self.conn.cursor()
+    #     current_table = ""
+    #     programs = {}
+    #     for table_name in self.list_db_tables():
+    #         if _os in table_name:
+    #             current_table += str(table_name)
+    #     for value in self.c.execute("SELECT * from " + current_table):
+    #         programs[str(value[0]).encode("utf-8","ignore")] = str(value[1]).encode("cp866")
+    #     return programs
+
+    def add_commands(self, text):
         text_low = str(text).lower()
         command = raw_input("Please, enter command what to do: \n")
         self.c.execute(
-            "insert into General(Command, OS,Text) values ('" + command + "\',\'" + OperationSystem + "\',\'" + text_low + "')")
+            "insert into General(Command, OS,Text) values ('" + command + "\',\'" + _os + "\',\'" + text_low + "')")
         return self.conn.commit()
 
-    def list_commands(self, OperationSystem):
+    def list_commands(self):
         self.list_command = {}
-        for value in self.c.execute("Select text, Command FROM General WHERE OS='" + OperationSystem + "'"):
+        for value in self.c.execute("Select text, Command FROM General WHERE OS='" + _os + "'"):
             if value[0] != None:
                 self.list_command[str(value[0])] = str(value[1])
         return self.list_command
@@ -64,15 +74,15 @@ class DataBase(object):
             indexed_commands[i] = value
         return indexed_commands
 
-    def remove_command(self, os, text):
+    def remove_command(self, text):
         text_low = str(text).lower()
         self.conn.cursor()
-        self.c.execute("delete FROM General WHERE OS='" + str(os) + "' AND Text='" + text_low + "'")
+        self.c.execute("delete FROM General WHERE OS='" + str(_os) + "' AND Text='" + text_low + "'")
         return self.conn.commit()
 
-    def get_text(self, os):
+    def get_text(self):
         text = set()
-        for value in self.c.execute("SELECT Text FROM General WHERE OS='" + os + "'"):
+        for value in self.c.execute("SELECT Text FROM General WHERE OS='" + _os + "'"):
             text.add(value[0].encode("utf-8", "ignore"))
         return text
 
@@ -282,12 +292,12 @@ class DecisionMaker(object):
         try:
             self.speack.speak("Listening...")
             text = self.speach.recognize()
-            text_in_db = self.db.get_text(_os)
+            text_in_db = self.db.get_text()
             splited_text = text.split(" ")
             for value in text_in_db:
                 for word in splited_text:
                     if (word in value) or (value in word):
-                        RunProgram(self.db.get_commands(value, _os))
+                        RunProgram(self.db.get_commands(value))
         except Exception:
             pass
 
@@ -297,6 +307,10 @@ if __name__ == '__main__':
     while True:
         des.decision2()
 
-    # TODO: Add face recognition
-    # TODO: Make administration posibility
-    # TODO: Make "access point" for administrating
+
+
+
+
+        # TODO: Add face recognition
+        # TODO: Make administration posibility
+        # TODO: Make "access point" for administrating
