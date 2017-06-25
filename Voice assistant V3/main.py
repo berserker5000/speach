@@ -30,7 +30,7 @@ class DataBase(object):
     def __init__(self):
         self.conn = sqlite3.connect(database="database.db", timeout=30)
         self.c = self.conn.cursor()
-        # self.fillin_tables()
+        self.fillin_tables()
 
     def get_commands(self, text):
         for word in text.split(" "):
@@ -236,7 +236,7 @@ class DecisionMaker(object):
 
         self.general_commands = GeneralCommands()
         self.db = DataBase()
-        self.speach = SpeechRecognize()
+        self.speach_recognize = SpeechRecognize()
         self.speack = Speaking()
 
     def decision(self, recognized_text, speak, general_command, os_type):
@@ -294,8 +294,7 @@ class DecisionMaker(object):
 
     def decision2(self):
         try:
-            self.speack.speak("Listening...")
-            text = self.speach.recognize()
+            text = self.speach_recognize.recognize()
             clean_dict = {}
             text_in_db = self.db.get_text()
             splited_text = text.split(" ")
@@ -310,27 +309,31 @@ class DecisionMaker(object):
                     elif len_sw > 1:
                         for key, value in self.db.get_os_software(word).iteritems():
                             if key != None:
-                                self.speack.speak("I have found a lot of software.")
                                 i += 1
                                 clean_dict[str(i)] = str(value)
                                 print i, ":", key
-                                self.speack.speak("Please, choose what to run")
-                                choose = raw_input("Enter number")
-                                if type(choose) != int:
-                                    print("Enter number only!")
-                                    pass
-                                else:
-                                    RunProgram(clean_dict.get(str(choose)))
+                        self.speack.speak("I have found a lot of software.")
+                        self.speack.speak("Please, choose what to run")
+                        choose = int(raw_input("Enter number: "))
+                        if type(choose) != int:
+                            print("Enter number only!")
+                            pass
+                        else:
+                            RunProgram(clean_dict.get(str(choose)))
+                    elif len_sw == 0:
+                        for value in text_in_db:
+                            if (word in value) or (value in word):
+                                RunProgram(self.db.get_commands(value))
                 else:
-                    for value in text_in_db:
-                        if (word in value) or (value in word):
-                            RunProgram(self.db.get_commands(value))
+                    self.speack.speak("I don't know what to do.")
+                    print(splited_text)
         except Exception:
             pass
 
 
 if __name__ == '__main__':
     des = DecisionMaker()
+    Speaking().speak("Let's start.")
     while True:
         des.decision2()
 
