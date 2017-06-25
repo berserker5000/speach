@@ -30,7 +30,7 @@ class DataBase(object):
     def __init__(self):
         self.conn = sqlite3.connect(database="database.db", timeout=30)
         self.c = self.conn.cursor()
-        self.fillin_tables()
+        # self.fillin_tables()
 
     def get_commands(self, text):
         for word in text.split(" "):
@@ -41,16 +41,20 @@ class DataBase(object):
                 else:
                     return False
 
-    # def get_os_software(self):
-    #     self.conn.cursor()
-    #     current_table = ""
-    #     programs = {}
-    #     for table_name in self.list_db_tables():
-    #         if _os in table_name:
-    #             current_table += str(table_name)
-    #     for value in self.c.execute("SELECT * from " + current_table):
-    #         programs[str(value[0]).encode("utf-8","ignore")] = str(value[1]).encode("cp866")
-    #     return programs
+    def get_os_software(self, text):
+        self.conn.cursor()
+        current_table = ""
+        programs = {}
+        for table_name in self.list_db_tables():
+            if _os in table_name:
+                current_table += str(table_name)
+        for word in text.split(" "):
+            for value in self.c.execute("SELECT * from " + current_table + " Where instr(Name,\'" + word + "\')"):
+                if value != None:
+                    programs[value[0]] = value[1]
+                else:
+                    return None
+        return programs
 
     def add_commands(self, text):
         text_low = str(text).lower()
@@ -292,12 +296,35 @@ class DecisionMaker(object):
         try:
             self.speack.speak("Listening...")
             text = self.speach.recognize()
+            clean_dict = {}
             text_in_db = self.db.get_text()
             splited_text = text.split(" ")
-            for value in text_in_db:
-                for word in splited_text:
-                    if (word in value) or (value in word):
-                        RunProgram(self.db.get_commands(value))
+            i = 0
+            for word in splited_text:
+                if self.db.get_os_software(word) != None:
+                    len_sw = len(self.db.get_os_software(word))
+                    if len_sw == 1:
+                        for value in self.db.get_os_software(word).iterkeys():
+                            if value != None:
+                                RunProgram(self.db.get_os_software(word)[1])
+                    elif len_sw > 1:
+                        for key, value in self.db.get_os_software(word).iteritems():
+                            if key != None:
+                                self.speack.speak("I have found a lot of software.")
+                                i += 1
+                                clean_dict[str(i)] = str(value)
+                                print i, ":", key
+                                self.speack.speak("Please, choose what to run")
+                                choose = raw_input("Enter number")
+                                if type(choose) != int:
+                                    print("Enter number only!")
+                                    pass
+                                else:
+                                    RunProgram(clean_dict.get(str(choose)))
+                else:
+                    for value in text_in_db:
+                        if (word in value) or (value in word):
+                            RunProgram(self.db.get_commands(value))
         except Exception:
             pass
 
@@ -311,6 +338,6 @@ if __name__ == '__main__':
 
 
 
-        # TODO: Add face recognition
-        # TODO: Make administration posibility
-        # TODO: Make "access point" for administrating
+# TODO: Add face recognition
+# TODO: Make administration posibility
+# TODO: Make "access point" for administrating
