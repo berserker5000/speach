@@ -266,6 +266,7 @@ class DecisionMaker(object):
                     self.command.run_bash_command(comp)
                 except Exception:
                     speak.speak("I had an exception. Can't proceed with your request.")
+                    pass
             elif len(comp) != 0 and os_type == "Windows":
                 if len(comp) > 1:
                     dictionary = dict()
@@ -288,9 +289,9 @@ class DecisionMaker(object):
                     speak.speak("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
                     os.popen2(comp[0])
             else:
-                speak.speak("I didn't found anything suitable program with request " + recognized_text)
-                speak.speak("Trying to find it in Google")
+                speak.speak("I didn't found any suitable program with request " + recognized_text)
                 general_command.google_search(recognized_text)
+                speak.speak("Trying to find it in Google")
 
     def decision2(self):
         try:

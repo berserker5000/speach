@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="2816500927">
+  <component name="DataSourceManagerImpl" format="xml" hash="1113887159">
     <data-source source="LOCAL" name="SQLite -" uuid="e5136108-582b-4eb9-bb1e-2d5e499ed6ce">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <auto-commit>false</auto-commit>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/Voice assistant V3/database.db</jdbc-url>
-      <libraries />
     </data-source>
   </component>
 </project>
