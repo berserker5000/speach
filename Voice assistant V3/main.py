@@ -321,10 +321,9 @@ class DecisionMaker(object):
                             pass
                         else:
                             RunProgram(clean_dict.get(str(choose)))
-                    elif len_sw == 0:
-                        for value in text_in_db:
-                            if (word in value) or (value in word):
-                                RunProgram(self.db.get_commands(value))
+                    for value in text_in_db:
+                        if (word in value) or (value in word):
+                            RunProgram(self.db.get_commands(value))
                 else:
                     self.speack.speak("I don't know what to do.")
                     print(splited_text)
