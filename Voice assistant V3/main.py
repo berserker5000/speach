@@ -34,6 +34,10 @@ class GoogleCommands(object):
                 text.add("http://" + str(req))
         return text
 
+    def add_url(self, url, request_text):
+        self.db.c.execute("insert INTO GoogleRequests(URL, Request) VALUES (" + str(url) + ',' + str(request_text))
+        return self.db.conn.commit()
+
 
 class SynonimList(object):
     def open(self):
@@ -53,7 +57,7 @@ class DataBase(object):
     def __init__(self):
         self.conn = sqlite3.connect(database="database.db", timeout=30)
         self.c = self.conn.cursor()
-        self.fillin_tables()
+        # self.fillin_tables()
 
     def get_commands(self, text):
         for word in text.split(" "):
@@ -79,9 +83,9 @@ class DataBase(object):
                     return None
         return programs
 
-    def add_commands(self, text):
+    def add_commands(self, text, command):
         text_low = str(text).lower()
-        command = raw_input("Please, enter command what to do: \n")
+        # command = raw_input("Please, enter command what to do: \n")
         self.c.execute(
             "insert into General(Command, OS,Text) values ('" + command + "\',\'" + _os + "\',\'" + text_low + "')")
         return self.conn.commit()
@@ -261,6 +265,10 @@ class DecisionMaker(object):
         self.db = DataBase()
         self.speach_recognize = SpeechRecognize()
         self.speack = Speaking()
+        if _os == "Linux":
+            self.os_software = LinuxCommands().generate_sw_list()
+        elif _os == "Windows":
+            self.os_software = WindowsCommands().generate_sw_list()
 
     # def decision(self, recognized_text, speak, general_command, os_type):
     #     if "mute" in recognized_text.split(" "):
@@ -322,36 +330,50 @@ class DecisionMaker(object):
             clean_dict = {}
             text_in_db = self.db.get_text()
             splited_text = text.split(" ")
-            i = 0
-            for word in splited_text:
-                if self.db.get_os_software(word) != None:
-                    len_sw = len(self.db.get_os_software(word))
-                    if len_sw == 1:
-                        for value in self.db.get_os_software(word).iterkeys():
-                            if value != None:
-                                RunProgram(self.db.get_os_software(word)[1])
-                    elif len_sw > 1:
-                        for key, value in self.db.get_os_software(word).iteritems():
-                            if key != None:
-                                i += 1
-                                clean_dict[str(i)] = str(value)
-                                print i, ":", key
-                        self.speack.speak("I have found a lot of software.")
-                        self.speack.speak("Please, choose what to run")
-                        choose = int(raw_input("Enter number: "))
-                        if type(choose) != int:
-                            print("Enter number only!")
-                            pass
-                        else:
-                            RunProgram(clean_dict.get(str(choose)))
-                    for value in text_in_db:
-                        if (word in value) or (value in word):
-                            RunProgram(self.db.get_commands(value))
+            comp = self.general_commands.comparator(self.os_software, text)
+            if len(comp) != 0 and _os == "Linux":
+                self.speack.speak("Trying to run " + str(comp))
+                try:
+                    RunProgram(comp)
+                except Exception:
+                    self.speack.speak("I had an exception. Can't proceed with your request.")
+                    pass
+            elif len(comp) != 0 and _os == "Windows":
+                if len(comp) > 1:
+                    dictionary = dict()
+                    i = 0
+                    self.speack.speak("I have found several programs. Please choose one to run")
+                    for c in comp:
+                        i += 1
+                        print(str(i) + ":" + c.split("\\")[-1].split(".lnk")[0])
+                        dictionary[i] = c
+                    try:
+                        inp = input("Enter number: ")
+                    except Exception:
+                        print ("Please, enter a valid number.")
+                        inp = input("Enter number: ")
+                    for key, value in dictionary.iteritems():
+                        if inp == key:
+                            RunProgram(value)
+                            self.db.add_commands(text, value)
                 else:
-                    self.speack.speak("I don't know what to do.")
-                    print(splited_text)
+                    self.speack.speak("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
+                    RunProgram(comp[0])
+            else:
+                try:
+                    for word in splited_text:
+                        if self.db.get_commands(word) != None:
+                            RunProgram(self.db.get_commands(word))
+                        else:
+                            GeneralCommands().what_to_do(self.speack, text)
+                except Exception:
+                    pass
         except Exception:
-            pass
+            self.speack.speak("Unexpected Error. Shuting down")
+            exit()
+
+
+
 
 
 if __name__ == '__main__':
