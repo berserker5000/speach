@@ -46,7 +46,7 @@ class Listener():
 
 class RunProgramExecutor():
     @staticmethod
-    def __softwareLinuxGenerator(self):
+    def __softwareLinuxGenerator():
         tmp_name = '/tmp/software_list_tmp.txt'
         q, e = [], []
         w = set()
@@ -71,7 +71,7 @@ class RunProgramExecutor():
         return w
 
     @staticmethod
-    def __softwareWindowsGenerator(self):
+    def __softwareWindowsGenerator():
         main_path = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
         directory = os.walk(main_path)
         names = dict()
@@ -83,7 +83,12 @@ class RunProgramExecutor():
 
     def execute(self, text):  # processing text
         splited_text = text.split(" ")
-        return os.popen2(program)
+        if _os == "Linux":
+            software_list = self.__softwareLinuxGenerator()
+        elif _os == "Windows":
+            software_list = self.__softwareWindowsGenerator()
+
+        return software_list  # os.popen2(program)
 
     def key_words(self):
         pass
@@ -102,7 +107,6 @@ class WebSearchExecutor():
     def percentCount(self):
         pass
 
-
 class SiteOpenExecutor():
     def execute(self, text):
         pass
@@ -113,3 +117,6 @@ class SiteOpenExecutor():
     def percentCount(self):
         pass
 
+
+x = RunProgramExecutor()
+print x.execute("some")
