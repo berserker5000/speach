@@ -39,20 +39,6 @@ class GoogleCommands(object):
         return self.db.conn.commit()
 
 
-class SynonimList(object):
-    def open(self):
-        op = ["open", "run", "start", "do"]
-        return op
-
-    def close(self):
-        cl = ["close", "exit from", "exit", "leave"]
-        return cl
-
-    def remove(self):
-        rm = ["remove", "delete", "wipe", "clean"]
-        return rm
-
-
 class DataBase(object):
     def __init__(self):
         self.conn = sqlite3.connect(database="database.db", timeout=30)
@@ -260,7 +246,7 @@ class SpeechRecognize(object):
 
 class DecisionMaker(object):
     def __init__(self):
-
+        self.google = GoogleCommands()
         self.general_commands = GeneralCommands()
         self.db = DataBase()
         self.speach_recognize = SpeechRecognize()
@@ -270,65 +256,9 @@ class DecisionMaker(object):
         elif _os == "Windows":
             self.os_software = WindowsCommands().generate_sw_list()
 
-    # def decision(self, recognized_text, speak, general_command, os_type):
-    #     if "mute" in recognized_text.split(" "):
-    #         self.command.mute_system()
-    #     elif "unmute" in recognized_text.split(" "):
-    #         self.command.unmute_system()
-    #     elif "calculator" in recognized_text.split(" "):
-    #         self.command.run_calculator()
-    #     elif recognized_text == "open google":
-    #         webbrowser.open_new("http://google.com")
-    #     elif recognized_text.startswith("search for"):
-    #         encode = "".join(recognized_text.encode("ascii", "ignore"))
-    #         general_command.google_search(encode.partition("search for")[2])
-    #     elif recognized_text == "exit":
-    #         exit()
-    #     elif "set volume" in recognized_text:
-    #         vol_encode = "".join(recognized_text.encode("ascii", "ignore"))
-    #         self.command.adjust_volume(re.findall('(\d)', vol_encode))
-    #     elif "time" in recognized_text:
-    #         speak.speak(general_command.current_time())
-    #     else:
-    #         comp = general_command.comparator(self.command.generate_sw_list(), recognized_text)
-    #         if len(comp) != 0 and os_type == "Linux":
-    #             speak.speak("Trying to run " + str(comp))
-    #             try:
-    #                 self.command.run_bash_command(comp)
-    #             except Exception:
-    #                 speak.speak("I had an exception. Can't proceed with your request.")
-    #                 pass
-    #         elif len(comp) != 0 and os_type == "Windows":
-    #             if len(comp) > 1:
-    #                 dictionary = dict()
-    #                 i = 0
-    #                 speak.speak("I have found several programs. Please choose one to run")
-    #                 for c in comp:
-    #                     i += 1
-    #                     print(str(i) + ":" + c.split("\\")[-1].split(".lnk")[0])
-    #                     dictionary[i] = c
-    #                 try:
-    #                     inp = input("Enter number: ")
-    #                 except Exception:
-    #                     print ("Please, enter a valid number.")
-    #                     inp = input("Enter number: ")
-    #                 for key, value in dictionary.iteritems():
-    #                     if inp == key:
-    #                         os.popen2(value)
-    #
-    #             else:
-    #                 speak.speak("Trying to run " + str(comp[0].split("\\")[-1].split(".")[0]))
-    #                 os.popen2(comp[0])
-    #         else:
-    #             speak.speak("I didn't found any suitable program with request " + recognized_text)
-    #             general_command.google_search(recognized_text)
-    #             # speak.speak("Trying to find it in Google")
-
-    def decision2(self):
+    def decision(self):
         try:
             text = self.speach_recognize.recognize()
-            clean_dict = {}
-            text_in_db = self.db.get_text()
             splited_text = text.split(" ")
             comp = self.general_commands.comparator(self.os_software, text)
             if len(comp) != 0 and _os == "Linux":
@@ -368,19 +298,35 @@ class DecisionMaker(object):
                             GeneralCommands().what_to_do(self.speack, text)
                 except Exception:
                     pass
+            if "search in internet" in text:
+                splited = text.split("search in internet")
+                if splited[-1].startswith(" for"):
+                    i = splited[-1].split(" ")[2:]
+                    for element in self.google.get_url(" ".join(i)):
+                        self.general_commands.google_search(element)
+                        self.google.add_url(element, " ".join(i))
+                else:
+                    for el in self.google.get_url(" ".join(splited[-1])):
+                        self.general_commands.google_search(el)
+                        self.google.add_url(el, " ".join(splited[-1]))
+            if "open site" in text:
+                splited = text.split("open site")
+                for i in splited[-1].split(" "):
+                    try:
+                        self.google.open_url(self.google.get_url(i))
+                    except Exception:
+                        self.speack.speak("Site not found. Enter web site URL.")
+                        self.google.add_url(raw_input("Enter url: "), text)
         except Exception:
             self.speack.speak("Unexpected Error. Shuting down")
             exit()
-
-
-
 
 
 if __name__ == '__main__':
     des = DecisionMaker()
     Speaking().speak("Let's start.")
     while True:
-        des.decision2()
+        des.decision()
 
 
 
