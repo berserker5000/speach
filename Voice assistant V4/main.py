@@ -119,5 +119,3 @@ class SiteOpenExecutor():
         pass
 
 
-x = RunProgramExecutor()
-print x.execute("some")

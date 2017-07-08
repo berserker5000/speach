@@ -2,16 +2,20 @@ import platform
 
 import wx
 
+from main import RunProgramExecutor
+
 
 class Frame(wx.Frame):
     def __init__(self, title="Speach recognize for os " + platform.system()):
+        programs = RunProgramExecutor()
+        self.swlist = programs.execute("some")
         wx.Frame.__init__(self, parent=None, title=title)
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
         panel = wx.Panel(self)
         box = wx.GridSizer(wx.HORIZONTAL)
 
-        self.control = wx.StaticText(panel, label="Hey, talk to me", size=(100, 100))
+        self.control = wx.TextCtrl(panel, size=(100, 100))
 
         close = wx.Button(panel, wx.ID_CLOSE, "Close")
         close.Bind(wx.EVT_BUTTON, self.onClose)
@@ -28,10 +32,13 @@ class Frame(wx.Frame):
 
     def OnPress(self, event):
         if self.check_box.IsChecked():
-            self.control.SetLabel("I'm not listening to you")
-            self.control.SetSize((100, 100))
+            self.control.SetValue("I'm not listening to you")
         else:
-            self.control.SetLabel("Hey, talk to me")
+            for key, value in self.swlist.iteritems():
+                try:
+                    self.control.SetValue(key + " // " + value)
+                except UnicodeDecodeError, e:
+                    pass
 
     def onClose(self, event):
         dialog = wx.MessageDialog(self, "Do you really want to close this application?", "Confirm Exit",
