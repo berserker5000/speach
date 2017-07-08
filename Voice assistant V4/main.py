@@ -49,7 +49,7 @@ class RunProgramExecutor():
     def __softwareLinuxGenerator():
         tmp_name = '/tmp/software_list_tmp.txt'
         q, e = [], []
-        w = set()
+        w = dict()
 
         try:
             subprocess.check_call(["apt", "list", "--installed"], stdout=open('/tmp/software_list_tmp.txt', 'wb'),
@@ -66,7 +66,7 @@ class RunProgramExecutor():
             e.append(i.split('/'))
 
         for i in e:
-            w.add(i[0])
+            w[i[0]] = i[0]
         q, e = None, None
         return w
 
@@ -106,6 +106,7 @@ class WebSearchExecutor():
 
     def percentCount(self):
         pass
+
 
 class SiteOpenExecutor():
     def execute(self, text):

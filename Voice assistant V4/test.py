@@ -1,4 +1,5 @@
 import platform
+
 import wx
 
 
@@ -8,7 +9,7 @@ class Frame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
         panel = wx.Panel(self)
-        box = wx.GridSizer()
+        box = wx.GridSizer(wx.HORIZONTAL)
 
         self.control = wx.StaticText(panel, label="Hey, talk to me", size=(100, 100))
 
@@ -19,8 +20,8 @@ class Frame(wx.Frame):
         self.check_box.Bind(wx.EVT_CHECKBOX, self.OnPress, self.check_box)
 
         box.Add(self.control, 0, wx.ALL, 10)
-        box.Add(self.check_box, 0, wx.ALL, 10)
-        box.Add(close, 1, wx.ALL, 10)
+        box.Add(self.check_box, 1, wx.ALL, 10)
+        box.Add(close, 2, wx.ALL, 10)
 
         panel.SetSizer(box)
         panel.Show()
