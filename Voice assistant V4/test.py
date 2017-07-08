@@ -8,7 +8,7 @@ from main import RunProgramExecutor
 class Frame(wx.Frame):
     def __init__(self, title="Speach recognize for os " + platform.system()):
         programs = RunProgramExecutor()
-        self.swlist = programs.execute("some")
+        self.swlist = programs.execute("python")
         wx.Frame.__init__(self, parent=None, title=title)
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
