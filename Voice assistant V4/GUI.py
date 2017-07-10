@@ -1,5 +1,4 @@
 import platform
-
 import wx
 
 from main import RunProgramExecutor
