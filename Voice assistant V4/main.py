@@ -44,7 +44,7 @@ class Listener():
                 pass
 
 
-class RunProgramExecutor():
+class RunProgramExecutorCommand():
     @staticmethod
     def __softwareLinuxGenerator():
         tmp_name = '/tmp/software_list_tmp.txt'
@@ -114,29 +114,46 @@ class RunProgramExecutor():
         key_words = ["run", "open", "run program", "open program"]
         return key_words
 
-    def percentCount(self):
-        pass
+    def procentCount(self, text):
+        splited_text = text.split(" ")
+        listed = 0
+        iterator = 0
+        if _os == "Linux":
+            software_dict = self.__softwareLinuxGenerator()
+        elif _os == "Windows":
+            software_dict = self.__softwareWindowsGenerator()
+
+        for word in splited_text:
+            for key, value in software_dict.iteritems():
+                if word == key:
+                    listed = 1
+                else:
+                    pass
+        return listed
 
 
-class WebSearchExecutor():
+class WebSearchExecutorCommand():
     def execute(self, text):
         pass
 
     def key_words(self):
         pass
 
-    def percentCount(self):
+    def procentCount(self):
         pass
 
 
-class SiteOpenExecutor():
+class SiteOpenExecutorCommand():
     def execute(self, text):
         pass
 
     def key_words(self):
         pass
 
-    def percentCount(self):
+    def procentCount(self):
         pass
 
 
+runProgram = RunProgramExecutorCommand()
+print runProgram.procentCount("run zoom")
+print runProgram.procentCount("run zoo")
