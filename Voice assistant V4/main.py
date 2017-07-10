@@ -106,6 +106,8 @@ class RunProgramExecutor():
                                         print(iterator, ":", i)
                                 else:
                                     return os.popen2(list(listed)[0])
+            else:
+                print "No such program"
 
 
     def key_words(self):
