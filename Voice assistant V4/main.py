@@ -34,11 +34,11 @@ class Processor():
         self.commands = commands
 
     def execute(self, text):
-        k = 0
+        identifier = 0
         for i in self.commands:
             if i.procent(text) == 1:
-                k = i.execute(text)
-                return k
+                identifier = i.execute(text)
+                return identifier
             else:
                 pass
-        return k
+        return identifier
