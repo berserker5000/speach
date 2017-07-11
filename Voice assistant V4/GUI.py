@@ -1,16 +1,13 @@
 import platform
 import wx
-
-from main import RunProgramExecutor
+import wx.animate
 
 
 class Frame(wx.Frame):
     def __init__(self, title="Speach recognize for os " + platform.system()):
-        programs = RunProgramExecutor()
-        self.swlist = programs.execute("python")
-        wx.Frame.__init__(self, parent=None, title=title)
+        wx.Frame.__init__(self, parent=None, title=title, size=(900, 900))
         self.Bind(wx.EVT_CLOSE, self.onClose)
-
+        gif_file_name = "1.gif"
         panel = wx.Panel(self)
         box = wx.GridSizer(wx.HORIZONTAL)
 
@@ -22,6 +19,9 @@ class Frame(wx.Frame):
         self.check_box = wx.CheckBox(panel, label="mute")
         self.check_box.Bind(wx.EVT_CHECKBOX, self.OnPress, self.check_box)
 
+        self.gif = wx.animate.GIFAnimationCtrl(self, id=-1, filename=gif_file_name, pos=(wx.Width, wx.Height))
+
+        self.gif.Play()
         box.Add(self.control, 0, wx.ALL, 10)
         box.Add(self.check_box, 1, wx.ALL, 10)
         box.Add(close, 2, wx.ALL, 10)
@@ -33,11 +33,7 @@ class Frame(wx.Frame):
         if self.check_box.IsChecked():
             self.control.SetValue("I'm not listening to you")
         else:
-            for key, value in self.swlist.iteritems():
-                try:
-                    self.control.SetValue(key + " // " + value)
-                except UnicodeDecodeError, e:
-                    pass
+            pass
 
     def onClose(self, event):
         dialog = wx.MessageDialog(self, "Do you really want to close this application?", "Confirm Exit",
@@ -50,5 +46,5 @@ class Frame(wx.Frame):
 
 app = wx.App()
 frame = Frame()
-frame.Show()
+frame.Show(True)
 app.MainLoop()
