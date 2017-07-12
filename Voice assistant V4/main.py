@@ -1,6 +1,6 @@
-
 import pyttsx
 import speech_recognition as sr
+
 
 class Speaker():
     def __init__(self, language="english"):
@@ -42,3 +42,7 @@ class Processor():
             else:
                 pass
         return identifier
+
+
+class Main():
+    pass
