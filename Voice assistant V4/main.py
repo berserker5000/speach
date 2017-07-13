@@ -2,6 +2,16 @@ import pyttsx
 import speech_recognition as sr
 
 
+# importing plugins
+
+# from utils import import_plugins
+#
+# plugins_dirs = "./Plugins"
+# sys.path.extend(plugins_dirs.split(os.pathsep))
+#
+# import_plugins(plugins_dirs, globals())
+
+
 class Speaker():
     def __init__(self, language="english"):
         self.engine = pyttsx.init()
