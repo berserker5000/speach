@@ -1,14 +1,9 @@
 import os
-# import platform
 
 import subprocess
 
 
-# _os = platform.system()
-
-
 class LinuxProgramExecutor():
-
     @staticmethod
     def __softwareLinuxGenerator():
         tmp_name = '/tmp/software_list_tmp.txt'
@@ -37,7 +32,6 @@ class LinuxProgramExecutor():
             q[value] = new_key_linux
         return q
 
-
     def execute(self, text):  # processing text
         splited_text = text.split(" ")
         s = set()
@@ -54,7 +48,7 @@ class LinuxProgramExecutor():
                         if each == i:
                             s.add(key)
 
-        #runing suitable program
+        # runing suitable program
         if len(s) == 1:
             os.popen2(software_dict[str(list(s)[0])][0])
         elif len(s) == 0:
@@ -70,8 +64,6 @@ class LinuxProgramExecutor():
             inp = input("Enter number what to run: ")
             os.popen2(software_dict[d[inp]][0])
         return "Can't run any program from your list"
-
-
 
     def procentCount(self, text):
         splited_text = text.split(" ")
