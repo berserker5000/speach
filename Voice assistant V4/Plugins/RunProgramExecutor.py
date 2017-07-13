@@ -29,8 +29,11 @@ class RunProgramExecutor():
 
         for i in e:
             w[i[0]] = i[0]
-        q, e = None, None
-        return w
+        q, e = dict(), None
+        for key, value in w.iteritems():
+            new_key_linux = key.split("-")
+            q[value] = new_key_linux
+        return q
 
     @staticmethod
     def __softwareWindowsGenerator():
@@ -45,31 +48,35 @@ class RunProgramExecutor():
 
     def execute(self, text):  # processing text
         splited_text = text.split(" ")
-        listed = set()
-        iterator = 0
+        s = set()
         if _os == "Linux":
-            software_list = self.__softwareLinuxGenerator()
+            software_dict = self.__softwareLinuxGenerator()
         elif _os == "Windows":
-            software_list = self.__softwareWindowsGenerator()
+            software_dict = self.__softwareWindowsGenerator()
         for element in splited_text:
-            if element in self.key_words():
-                get_command = text.split(element)[1]
-                for key, value in software_list.iteritems():
-                    if get_command in key:
-                        return os.popen2(value)
-                    else:
-                        for command_word in get_command.split():
-                            if command_word in key:
-                                listed.add(value)
-                                if len(listed) > 1:
-                                    print("Found more then 1 item, please choose")
-                                    for i in listed:
-                                        iterator += 1
-                                        print(iterator, ":", i)
-                                else:
-                                    return os.popen2(list(listed)[0])
-            else:
-                print "No such program"
+            get_command = " ".join(text.split(element)[1].split(" ")[1:]).split(" ")
+            for each in get_command:
+                for key, value in software_dict.iteritems():
+                    for i in value:
+                        if each == i:
+                            s.add(key)
+        if len(s) == 1:
+            os.popen2(software_dict[str(list(s)[0])][0])
+        elif len(s) == 0:
+            return
+        else:
+            iterator = 0
+            d = dict()
+            for i in s:
+                iterator += 1
+                d[iterator] = i
+            for i, v in d.iteritems():
+                print i, v
+            inp = input("Enter numberwhat to run: ")
+            os.popen2(software_dict[d[inp]][0])
+        return
+
+
 
     def procentCount(self, text):
         splited_text = text.split(" ")
@@ -91,3 +98,4 @@ class RunProgramExecutor():
                 else:
                     pass
         return counter
+
