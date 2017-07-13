@@ -1,12 +1,14 @@
 import os
-import platform
+# import platform
 
 import subprocess
 
-_os = platform.system()
+
+# _os = platform.system()
 
 
-class RunProgramExecutor():
+class LinuxProgramExecutor():
+
     @staticmethod
     def __softwareLinuxGenerator():
         tmp_name = '/tmp/software_list_tmp.txt'
@@ -35,24 +37,15 @@ class RunProgramExecutor():
             q[value] = new_key_linux
         return q
 
-    @staticmethod
-    def __softwareWindowsGenerator():
-        main_path = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-        directory = os.walk(main_path)
-        names = dict()
-        for root, dirs, files in directory:
-            for f in files:
-                if f.endswith("lnk"):
-                    names[f.split(".lnk")[0].lower()] = ('"' + root + "\\" + f + '"')
-        return names
 
     def execute(self, text):  # processing text
         splited_text = text.split(" ")
         s = set()
-        if _os == "Linux":
-            software_dict = self.__softwareLinuxGenerator()
-        elif _os == "Windows":
-            software_dict = self.__softwareWindowsGenerator()
+
+        # defining OS and generating dict with installed software
+        software_dict = self.__softwareLinuxGenerator()
+
+        # making list with elements that are suitable to request
         for element in splited_text:
             get_command = " ".join(text.split(element)[1].split(" ")[1:]).split(" ")
             for each in get_command:
@@ -60,10 +53,12 @@ class RunProgramExecutor():
                     for i in value:
                         if each == i:
                             s.add(key)
+
+        #runing suitable program
         if len(s) == 1:
             os.popen2(software_dict[str(list(s)[0])][0])
         elif len(s) == 0:
-            return
+            return "No program was found"
         else:
             iterator = 0
             d = dict()
@@ -72,9 +67,9 @@ class RunProgramExecutor():
                 d[iterator] = i
             for i, v in d.iteritems():
                 print i, v
-            inp = input("Enter numberwhat to run: ")
+            inp = input("Enter number what to run: ")
             os.popen2(software_dict[d[inp]][0])
-        return
+        return "Can't run any program from your list"
 
 
 
@@ -82,10 +77,7 @@ class RunProgramExecutor():
         splited_text = text.split(" ")
         counter = 0
 
-        if _os == "Linux":
-            software_dict = self.__softwareLinuxGenerator()
-        elif _os == "Windows":
-            software_dict = self.__softwareWindowsGenerator()
+        software_dict = self.__softwareLinuxGenerator()
 
         for word in splited_text:
             for key, value in software_dict.iteritems():
@@ -98,4 +90,3 @@ class RunProgramExecutor():
                 else:
                     pass
         return counter
-
