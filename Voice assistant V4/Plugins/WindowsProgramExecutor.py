@@ -15,36 +15,36 @@ class WindowsProgramExecutor():
 
     def execute(self, text):  # processing text
         splited_text = text.split(" ")
-        s = set()
+        s = dict()
 
-        # defining OS and generating dict with installed software
+        # generating dict with installed software
         software_dict = self.__softwareWindowsGenerator()
 
         # making list with elements that are suitable to request
         for element in splited_text:
-            get_command = " ".join(text.split(element)[1].split(" ")[1:]).split(" ")
-            for each in get_command:
-                for key, value in software_dict.iteritems():
-                    for i in value:
-                        if each == i:
-                            s.add(key)
+            for key, value in software_dict.iteritems():
+                if len(key) > 1:
+                    for i in key.split(" "):
+                        if element == i:
+                            s[key] = value
 
-        # runing suitable program
         if len(s) == 1:
-            os.popen2(software_dict[str(list(s)[0])][0])
-        elif len(s) == 0:
-            return "No program was found"
-        else:
+            for k, v in s.iteritems():
+                return os.popen2(v)
+        elif len(s) > 1:
             iterator = 0
-            d = dict()
-            for i in s:
+            tmp_dict = dict()
+            for k, v in s.iteritems():
                 iterator += 1
-                d[iterator] = i
-            for i, v in d.iteritems():
-                print i, v
-            inp = input("Enter number what to run: ")
-            os.popen2(software_dict[d[inp]][0])
-        return "Can't run any program from your list"
+                tmp_dict[iterator] = k
+                print iterator, k
+            try:
+                choice = input("Enter number: ")
+                return os.popen2(s[tmp_dict[choice]])
+            except Exception:
+                return
+
+        return
 
     def procentCount(self, text):
         splited_text = text.split(" ")
