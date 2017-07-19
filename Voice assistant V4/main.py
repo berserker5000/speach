@@ -49,9 +49,6 @@ def load_plugins(path):
     return list_of_instances
 
 
-
-
-
 class Speaker():
     def __init__(self, language="english"):
         self.engine = pyttsx.init()
@@ -95,4 +92,5 @@ class Main():
 
 
 processor = Processor(load_plugins(path_name))
-print processor.execute("run fucking chromium-browser bitch")
+
+print sys.modules.keys()
