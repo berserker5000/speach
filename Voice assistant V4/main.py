@@ -92,5 +92,5 @@ class Main():
 
 
 processor = Processor(load_plugins(path_name))
-
-print sys.modules.keys()
+listen = Listener()
+listen.recognize()
