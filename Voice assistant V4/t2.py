@@ -1,85 +1,46 @@
-class Processor():
-    def __init__(self, *commands):
-        self.commands = commands
+import os
+import sys
 
-    def execute(self, text):
-        k = 0
-        for i in self.commands:
-            if i.procent(text) == 1:
-                k = i.execute(text)
-                return k
-            else:
-                pass
-        return k
+path_name = "./Plugins"
+
+import imp
 
 
-# 1 - success, 0 - nothing to do, -1 - error
+def load_from_file(filepath):
+    """Initializing of all classes"""
 
-class RunProgram():
-    def procent(self, text):
-        if text == "open zoom":
-            return 1
-        elif text == "open jitsi":
-            return 1
+    class_inst = None
+    expected_class = filepath.split("/")[-1].split(".py")[0]
 
-        return 0
+    mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
 
-    def execute(self, text):
-        if text == "open zoom":
-            return "runing zoom"
-        elif text == "open jitsi":
-            return "runing jitsi"
+    if file_ext.lower() == '.py':
+        py_mod = imp.load_source(mod_name, filepath)
+
+    elif file_ext.lower() == '.pyc':
+        py_mod = imp.load_compiled(mod_name, filepath)
+
+    if hasattr(py_mod, expected_class):
+        class_inst = getattr(py_mod, expected_class)()
+    else:
+        print expected_class + " not found in " + filepath
+
+    return class_inst
+
+
+def load_plugins(path):
+    """Importing all plugins from Plugins folder.
+    Returns list of initialized plugins. Can be provided to Processor"""
+
+    sys.path.append(path)
+    list_of_instances = list()
+    for file_name in os.listdir(path):
+        if file_name == "__init__.py":
+            pass
+        elif file_name.endswith(".py"):
+            print "IMPORTING: " + path + "/" + file_name
+            __import__(file_name.split(".py")[0])
+            list_of_instances.append(load_from_file(path + "/" + file_name))
         else:
-            return "nothing to run"
-
-
-class Call():
-    def procent(self, text):
-        if text == "call dima":
-            return 1
-        elif text == "call vasya":
-            return 1
-        else:
-            return 0
-
-    def execute(self, text):
-        if text == "call dima":
-            return "Calling Dima"
-        elif text == "call vasya":
-            return "Calling Vasya"
-        return "not calling"
-
-
-class Mail():
-    def procent(self, text):
-        if text == "mail dima":
-            return 1
-        elif text == "mail vasya":
-            return 1
-        else:
-            return 0
-
-    def execute(self, text):
-        if text == "mail dima":
-            return "Sending mail to Dima"
-        elif text == "mail vasya":
-            return "Sending mail to Vasya"
-        else:
-            return "nothing to send"
-
-
-program = RunProgram()
-program2 = RunProgram()
-calling = Call()
-mail = Mail()
-processor = Processor(program, calling, mail, program2)
-
-processor.execute("open zoom")
-print
-processor.execute("call dima")
-print
-processor.execute("open zoo")
-print
-processor.execute("mail dima")
-print
-processor.execute("open jitsi")
+            pass
+    return list_of_instances

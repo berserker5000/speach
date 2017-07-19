@@ -1,6 +1,6 @@
-class SiteOpenExecutorCommand():
+class SiteOpenExecutor():
     def execute(self, text):
         pass
 
-    def procentCount(self):
+    def procentCount(self, text):
         pass

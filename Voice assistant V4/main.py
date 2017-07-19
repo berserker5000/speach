@@ -1,15 +1,55 @@
+import os
+import sys
+
 import pyttsx
 import speech_recognition as sr
 
+path_name = "./Plugins"
 
-# importing plugins
+import imp
 
-# from utils import import_plugins
-#
-# plugins_dirs = "./Plugins"
-# sys.path.extend(plugins_dirs.split(os.pathsep))
-#
-# import_plugins(plugins_dirs, globals())
+
+def load_from_file(filepath):
+    """Initializing of all classes"""
+
+    class_inst = None
+    expected_class = filepath.split("/")[-1].split(".py")[0]
+
+    mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
+
+    if file_ext.lower() == '.py':
+        py_mod = imp.load_source(mod_name, filepath)
+
+    elif file_ext.lower() == '.pyc':
+        py_mod = imp.load_compiled(mod_name, filepath)
+
+    if hasattr(py_mod, expected_class):
+        class_inst = getattr(py_mod, expected_class)()
+    else:
+        print expected_class + " not found in " + filepath
+
+    return class_inst
+
+
+def load_plugins(path):
+    """Importing all plugins from Plugins folder.
+    Returns list of initialized plugins. Can be provided to Processor"""
+
+    sys.path.append(path)
+    list_of_instances = list()
+    for file_name in os.listdir(path):
+        if file_name == "__init__.py":
+            pass
+        elif file_name.endswith(".py"):
+            # print "IMPORTING: " + path + "/" + file_name
+            __import__(file_name.split(".py")[0])
+            list_of_instances.append(load_from_file(path + "/" + file_name))
+        else:
+            pass
+    return list_of_instances
+
+
+
 
 
 class Speaker():
@@ -40,19 +80,19 @@ class Listener():
 
 
 class Processor():
-    def __init__(self, *commands):
+    def __init__(self, commands):
         self.commands = commands
 
     def execute(self, text):
-        identifier = 0
-        for i in self.commands:
-            if i.procent(text) == 1:
-                identifier = i.execute(text)
-                return identifier
-            else:
-                pass
-        return identifier
+        for element in self.commands:
+            if element.procentCount(text) == 1:
+                return element.execute(text)
+        return
 
 
 class Main():
     pass
+
+
+processor = Processor(load_plugins(path_name))
+print processor.execute("run fucking chromium-browser bitch")
