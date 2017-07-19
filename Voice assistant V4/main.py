@@ -49,7 +49,7 @@ def load_plugins(path):
     return list_of_instances
 
 
-class Speaker():
+class Speaker(object):
     def __init__(self, language="english"):
         self.engine = pyttsx.init()
         voices = self.engine.getProperty('voices')
@@ -62,7 +62,7 @@ class Speaker():
         return self.engine.runAndWait()
 
 
-class Listener():
+class Listener(object):
     def recognize(self):
         r = sr.Recognizer()
         with sr.Microphone() as source:
@@ -76,7 +76,7 @@ class Listener():
                 pass
 
 
-class Processor():
+class Processor(object):
     def __init__(self, commands):
         self.commands = commands
 
@@ -87,10 +87,20 @@ class Processor():
         return
 
 
-class Main():
+class Assistant(object):
+    def __init__(self, processor):
+        self.processor = processor
+
+    def getInput(self, inp):
+        self.inp = inp
+        return str(self.inp)
+
+
+class Main(object):
     pass
 
 
 processor = Processor(load_plugins(path_name))
-listen = Listener()
-listen.recognize()
+assistant = Assistant(processor)
+x = raw_input("Enter what you want: ")
+print assistant.getInput(x)
