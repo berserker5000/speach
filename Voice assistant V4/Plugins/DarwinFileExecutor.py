@@ -1,4 +1,4 @@
-class SiteOpenExecutor(object):
+class DarwinFileExecutor(object):
     def execute(self, text):
         pass
 

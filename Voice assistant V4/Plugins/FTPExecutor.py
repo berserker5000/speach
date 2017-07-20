@@ -1,4 +1,4 @@
-class SiteOpenExecutor(object):
+class FTPExecutor(object):
     def execute(self, text):
         pass
 

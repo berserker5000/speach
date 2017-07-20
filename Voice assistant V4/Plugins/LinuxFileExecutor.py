@@ -1,4 +1,4 @@
-class SiteOpenExecutor(object):
+class LinuxFileExecutor(object):
     def execute(self, text):
         pass
 

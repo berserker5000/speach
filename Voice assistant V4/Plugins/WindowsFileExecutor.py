@@ -1,4 +1,4 @@
-class SiteOpenExecutor(object):
+class WindowsFileExecutor(object):
     def execute(self, text):
         pass
 

@@ -1,4 +1,4 @@
-class SiteOpenExecutor(object):
+class WebSiteParser(object):
     def execute(self, text):
         pass
 
