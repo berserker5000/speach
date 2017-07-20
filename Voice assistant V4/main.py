@@ -1,6 +1,5 @@
 import os
 import sys
-import threading
 
 import pyttsx
 import speech_recognition as sr
@@ -89,19 +88,22 @@ class Processor(object):
 
 
 class Assistant(object):
-    def __init__(self):
-        self.stdout_lock = threading.Lock()
+    def __init__(self, processor, inp):
+        self.processor = processor
+        self.inp = inp
 
-    def textInput(self, processor):
-        while 1:
-            with self.stdout_lock:
-                inp = raw_input("Please, enter what you want to do: ")
-                if inp == "exit" or inp == "quit":
-                    exit()
+    def start(self):
+        while True:
+            text = self.inp.gettext()
+            if text == "exit":
+                break
+            self.processor.execute(text)
+        return
 
-            with self.stdout_lock:
-                processor.execute(inp)
-        return 0
+
+class ConsoleInput(object):
+    def gettext(self):
+        return raw_input("Enter text: ")
 
 
 class Main(object):
@@ -109,5 +111,6 @@ class Main(object):
 
 
 processor = Processor(load_plugins(path_name))
-assistant = Assistant()
-processor.execute(assistant.textInput(processor))
+assistant = Assistant(processor, ConsoleInput())
+assistant.start()
+# processor.execute(assistant.textInput())
