@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 
 import pyttsx
 import speech_recognition as sr
@@ -41,7 +42,7 @@ def load_plugins(path):
         if file_name == "__init__.py":
             pass
         elif file_name.endswith(".py"):
-            # print "IMPORTING: " + path + "/" + file_name
+            print "IMPORTING: " + file_name.split(".")[0]
             __import__(file_name.split(".py")[0])
             list_of_instances.append(load_from_file(path + "/" + file_name))
         else:
@@ -88,12 +89,19 @@ class Processor(object):
 
 
 class Assistant(object):
-    def __init__(self, processor):
-        self.processor = processor
+    def __init__(self):
+        self.stdout_lock = threading.Lock()
 
-    def getInput(self, inp):
-        self.inp = inp
-        return str(self.inp)
+    def textInput(self, processor):
+        while 1:
+            with self.stdout_lock:
+                inp = raw_input("Please, enter what you want to do: ")
+                if inp == "exit" or inp == "quit":
+                    exit()
+
+            with self.stdout_lock:
+                processor.execute(inp)
+        return 0
 
 
 class Main(object):
@@ -101,6 +109,5 @@ class Main(object):
 
 
 processor = Processor(load_plugins(path_name))
-assistant = Assistant(processor)
-x = raw_input("Enter what you want: ")
-print assistant.getInput(x)
+assistant = Assistant()
+processor.execute(assistant.textInput(processor))
