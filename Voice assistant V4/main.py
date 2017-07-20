@@ -94,7 +94,7 @@ class Assistant(object):
 
     def start(self):
         while True:
-            text = self.inp.gettext()
+            text = self.inp.getText()
             if text == "exit":
                 break
             self.processor.execute(text)
@@ -102,8 +102,9 @@ class Assistant(object):
 
 
 class ConsoleInput(object):
-    def gettext(self):
-        return raw_input("Enter text: ")
+    def getText(self):
+        inp = raw_input("Enter text: ")
+        return inp
 
 
 class Main(object):
@@ -113,4 +114,3 @@ class Main(object):
 processor = Processor(load_plugins(path_name))
 assistant = Assistant(processor, ConsoleInput())
 assistant.start()
-# processor.execute(assistant.textInput())
