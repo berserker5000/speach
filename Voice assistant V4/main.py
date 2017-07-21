@@ -4,7 +4,8 @@ import sys
 import pyttsx
 import speech_recognition as sr
 
-path_name = "./Plugins"
+cur_dir = os.path.dirname(os.path.abspath(__file__))
+path_name = cur_dir + "/Plugins"
 
 import imp
 
@@ -26,7 +27,7 @@ def load_from_file(filepath):
     if hasattr(py_mod, expected_class):
         class_inst = getattr(py_mod, expected_class)()
     else:
-        print expected_class + " not found in " + filepath
+        return expected_class + " not found in " + filepath
 
     return class_inst
 
