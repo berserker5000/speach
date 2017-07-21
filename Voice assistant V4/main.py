@@ -10,6 +10,18 @@ path_name = cur_dir + "/Plugins"
 import imp
 
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    YELLOWFILL = '\033[103m'
+
+
 def load_from_file(filepath):
     """Initializing of all classes"""
 
@@ -42,7 +54,7 @@ def load_plugins(path):
         if file_name == "__init__.py":
             pass
         elif file_name.endswith(".py"):
-            print "IMPORTING: " + file_name.split(".")[0]
+            print bcolors().YELLOWFILL + "IMPORTING: " + bcolors().ENDC + file_name.split(".")[0]
             __import__(file_name.split(".py")[0])
             list_of_instances.append(load_from_file(path + "/" + file_name))
         else:
