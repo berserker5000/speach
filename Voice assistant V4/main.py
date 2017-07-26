@@ -9,6 +9,11 @@ path_name = cur_dir + "/Plugins"
 
 import imp
 
+'''
+Each module MUST have nothingCanDo, execute, procentCount
+'''
+
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -76,7 +81,7 @@ class Speaker(object):
 
 
 class Listener(object):
-    def recognize(self):
+    def getText(self):
         r = sr.Recognizer()
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source)
@@ -85,7 +90,7 @@ class Listener(object):
                 recognize = r.recognize_google(audio)
                 recognize_lower = recognize.lower()
                 return str(recognize_lower)
-            except sr.UnknownValueError:
+            except Exception:
                 pass
 
 

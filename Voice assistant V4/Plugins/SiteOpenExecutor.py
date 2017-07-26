@@ -48,3 +48,6 @@ class SiteOpenExecutor(object):
                     if i in valuedict.iterkeys():
                         return 1
         return 0
+
+    def nothingCanDo(self):
+        pass
