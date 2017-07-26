@@ -62,3 +62,6 @@ class WindowsProgramExecutor():
                 else:
                     pass
         return counter
+
+    def nothingCanDo(self):
+        pass

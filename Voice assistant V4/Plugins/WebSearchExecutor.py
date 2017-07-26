@@ -16,3 +16,6 @@ class WebSearchExecutor():
             if key in text:
                 return 1
         return 0
+
+    def nothingCanDo(self):
+        pass

@@ -10,3 +10,6 @@ class GetTimeExecutor():
         if "time" in text:
             counter = 1
         return counter
+
+    def nothingCanDo(self):
+        pass

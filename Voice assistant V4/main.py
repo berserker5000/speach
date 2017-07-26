@@ -5,7 +5,7 @@ import pyttsx
 import speech_recognition as sr
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
-path_name = cur_dir + "/Plugins"
+plugins_directory = cur_dir + "/Plugins"
 
 import imp
 
@@ -15,7 +15,6 @@ procentCount should return 0 - if can't do anything with request, 1 - if can mak
 nothingCanDo should return text with explanation why can't execute process
 execute should return executed process and run what it must
 '''
-
 
 
 class bcolors:
@@ -132,6 +131,6 @@ class Main(object):
     pass
 
 
-processor = Processor(load_plugins(path_name))
+processor = Processor(load_plugins(plugins_directory))
 assistant = Assistant(processor, ConsoleInput())
 assistant.start()

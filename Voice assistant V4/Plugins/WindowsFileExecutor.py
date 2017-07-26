@@ -4,3 +4,6 @@ class WindowsFileExecutor(object):
 
     def procentCount(self, text):
         pass
+
+    def nothingCanDo(self):
+        pass
