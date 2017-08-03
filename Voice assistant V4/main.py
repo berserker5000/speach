@@ -4,6 +4,9 @@ import sys
 import pyttsx
 import speech_recognition as sr
 
+from SysInfo import SystemInformation
+
+sysinfo = SystemInformation()
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 plugins_directory = cur_dir + "/Plugins"
 
@@ -29,7 +32,7 @@ class bcolors:
     YELLOWFILL = '\033[103m'
 
 
-def load_from_file(filepath):
+def load_module_from_file(filepath):
     """Initializing of all classes"""
 
     class_inst = None
@@ -46,7 +49,7 @@ def load_from_file(filepath):
     if hasattr(py_mod, expected_class):
         class_inst = getattr(py_mod, expected_class)()
     else:
-        return expected_class + " not found in " + filepath
+        return bcolors().FAIL + expected_class + " not found in " + filepath + bcolors().ENDC
 
     return class_inst
 
@@ -63,7 +66,7 @@ def load_plugins(path):
         elif file_name.endswith(".py"):
             print bcolors().YELLOWFILL + "IMPORTING: " + bcolors().ENDC + file_name.split(".")[0]
             __import__(file_name.split(".py")[0])
-            list_of_instances.append(load_from_file(path + "/" + file_name))
+            list_of_instances.append(load_module_from_file(path + "/" + file_name))
         else:
             pass
     return list_of_instances
@@ -125,10 +128,6 @@ class ConsoleInput(object):
     def getText(self):
         inp = raw_input("Enter text: ")
         return inp
-
-
-class Main(object):
-    pass
 
 
 processor = Processor(load_plugins(plugins_directory))
