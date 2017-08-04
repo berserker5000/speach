@@ -1,3 +1,4 @@
+import imp
 import os
 import sys
 
@@ -9,8 +10,6 @@ from SysInfo import SystemInformation
 sysinfo = SystemInformation()
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 plugins_directory = cur_dir + "/Plugins"
-
-import imp
 
 '''
 Each module MUST have nothingCanDo, execute, procentCount
