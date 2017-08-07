@@ -21,12 +21,7 @@ class SystemInformation(object):
         return set(sys.modules.keys())
 
     def getImportedPlugins(self):
-        # imported_plugins = list()
         plugins = self.getPluginList()
         modules = self.getImportedModules()
-        # for plugin in plugins:
-        #     for module in modules:
-        #         if plugin == module:
-        #             imported_plugins.append(plugin)
         imported_plugins = modules.intersection(plugins)
         return imported_plugins
