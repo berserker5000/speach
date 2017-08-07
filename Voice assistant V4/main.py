@@ -130,5 +130,6 @@ class ConsoleInput(object):
 
 
 processor = Processor(load_plugins(plugins_directory))
-assistant = Assistant(processor, ConsoleInput())
-assistant.start()
+# assistant = Assistant(processor, ConsoleInput())
+# assistant.start()
+# print sysinfo.getPluginList()
