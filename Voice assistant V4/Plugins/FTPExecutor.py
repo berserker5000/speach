@@ -3,7 +3,7 @@ import os
 from ftplib import FTP
 
 class FTPExecutor(object):
-    def __init__(self, server, port=21):
+    def setServer(self, server, port=21):
         self.server = server
         self.port = port
         self.ftp = FTP(self.server, self.port)

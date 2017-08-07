@@ -1,5 +1,6 @@
 import webbrowser
 
+
 class WebSearchExecutor():
     keys = ["search", "look for", "search in internet for", "look in internet for", "find in internet", "find for",
             "search for"]
