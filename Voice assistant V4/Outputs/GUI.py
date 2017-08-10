@@ -3,9 +3,9 @@ import wx
 import wx.animate
 
 
-class Frame(wx.Frame):
+class GUI(wx.Frame):
     def __init__(self, *args, **kwargs):
-        super(Frame, self).__init__(*args, **kwargs)
+        super(GUI, self).__init__(*args, **kwargs)
 
         self.InitUI()
 
@@ -63,7 +63,7 @@ class Frame(wx.Frame):
 
 def main_gui():
     ex = wx.App()
-    Frame(None)
+    GUI(None)
     ex.MainLoop()
 
 
