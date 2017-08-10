@@ -9,6 +9,6 @@ class VoiceOutput(object):
         self.engine.setProperty('voice', language)
         self.engine.setProperty('rate', 150)
 
-    def speak(self, text):
+    def output(self, text):
         self.engine.say(text)
         return self.engine.runAndWait()
