@@ -5,14 +5,6 @@ from SysInfo import SystemInformation
 sysinfo = SystemInformation()
 
 
-'''
-Each module MUST have nothingCanDo, execute, procentCount
-procentCount should return 0 - if can't do anything with request, 1 - if can make everything.
-nothingCanDo should return text with explanation why can't execute process
-execute should return executed process and run what it must
-'''
-
-
 class Processor(object):
     def __init__(self, commands):
         self.commands = commands
