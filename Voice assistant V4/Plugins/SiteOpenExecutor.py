@@ -41,7 +41,7 @@ class SiteOpenExecutor(object):
 
     def procentCount(self, text):
         valuedict = self.getValuesFromFile()
-        keywords = ["web site", "site", " open site"]
+        keywords = ["web site", "site", " open site", "open"]
         for word in keywords:
             if word in text:
                 for i in text.split(" "):
