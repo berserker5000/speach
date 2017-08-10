@@ -52,12 +52,13 @@ def InputChoose():
         i += 1
         tmp[i] = name
         print i, name
+
     chosen_input = input("Please, enter what to use (enter just number):\n")
     try:
         return input_list[tmp[chosen_input]]
     except Exception:
         print "Error occurred. Program will be closed"
-        return
+    return
 
 
 processor = Processor(load_plugins(plugins_directory))

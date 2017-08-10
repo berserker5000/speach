@@ -1,7 +1,7 @@
 import speech_recognition as sr
 
 
-class SpeachInput(object):
+class VoiceInput(object):
     def getText(self):
         r = sr.Recognizer()
         with sr.Microphone() as source:
@@ -10,6 +10,8 @@ class SpeachInput(object):
                 audio = r.listen(source)
                 recognize = r.recognize_google(audio)
                 recognize_lower = recognize.lower()
+                if recognize_lower == None:
+                    pass
                 return str(recognize_lower)
             except Exception:
                 pass
