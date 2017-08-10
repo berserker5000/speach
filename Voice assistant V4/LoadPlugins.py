@@ -25,7 +25,7 @@ def load_module_from_file(filepath):
     if hasattr(py_mod, expected_class):
         class_inst = getattr(py_mod, expected_class)()
     else:
-        return bcolors().FAIL + expected_class + " not found in " + filepath + bcolors().ENDC
+        return bcolors().Red + expected_class + " not found in " + filepath + bcolors().ENDC
 
     return class_inst
 

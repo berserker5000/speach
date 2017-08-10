@@ -24,7 +24,7 @@ class Inputs(object):
         if hasattr(py_mod, expected_class):
             input_inst = getattr(py_mod, expected_class)()
         else:
-            return bcolors().FAIL + expected_class + " not found in " + filepath + bcolors().ENDC
+            return bcolors().Red + expected_class + " not found in " + filepath + bcolors().ENDC
 
         return input_inst
 
