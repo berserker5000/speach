@@ -45,7 +45,7 @@ def InputChoose():
         tmp[i] = name
         print i, name
 
-    chosen_input = input("Please, enter what to use (enter just number):\n")
+    chosen_input = raw_input("Please, enter what to use (enter just number):\n")
     try:
         return input_list[tmp[chosen_input]]
     except Exception:

@@ -40,7 +40,7 @@ def load_plugins(path=plugins_directory):
         if file_name == "__init__.py":
             pass
         elif file_name.endswith(".py"):
-            print bcolors().YellowFill + "IMPORTING Plugin: " + bcolors().ENDC + file_name.split(".")[0]
+            # print bcolors().YellowFill + "IMPORTING Plugin: " + bcolors().ENDC + file_name.split(".")[0]
             __import__(file_name.split(".py")[0])
             list_of_instances.append(load_module_from_file(path + "/" + file_name))
         else:
