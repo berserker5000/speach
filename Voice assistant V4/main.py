@@ -47,8 +47,8 @@ def InputChoose():
 
     chosen_input = raw_input("Please, enter what to use (enter just number):\n")
     try:
-        return input_list[tmp[chosen_input]]
-    except Exception:
+        return input_list[tmp[int(chosen_input)]]
+    except Exception, e:
         print "Error occurred. Program will be closed"
     return
 
