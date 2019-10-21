@@ -8,4 +8,4 @@ pyalsaaudio==0.7
 PyAudio==0.2.11
 pyttsx==1.1
 SpeechRecognition==3.6.5
-urllib3==1.20
+urllib3==1.24.2
